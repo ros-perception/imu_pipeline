@@ -1,0 +1,16 @@
+<package>
+  <description brief="imu_transformer">
+
+     imu_transformer
+
+  </description>
+  <author>Chad Rockey</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes="" />
+  <url>http://ros.org/wiki/imu_transformer</url>
+  <depend package="sensor_msgs" />
+  <depend package="tf" />
+
+</package>
+
+
