@@ -1,6 +1,6 @@
 # http://ros.org/doc/groovy/api/catkin/html/user_guide/supposed.html
 cmake_minimum_required(VERSION 2.8)
-project(imu_transformer)
+project(imu_pipeline)
 
 # Load catkin and all dependencies required for this package
 find_package(catkin REQUIRED roscpp sensor_msgs tf)
