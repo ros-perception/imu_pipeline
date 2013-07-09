@@ -1,14 +1,14 @@
 <package>
-  <name>imu_transformer</name>
+  <name>imu_pipeline</name>
   <version>0.1.0</version>
-  <description>imu_transformer</description>
+  <description>imu_pipeline</description>
   <maintainer email="chadrockey@willowgarage.com">Chad Rockey</maintainer>
 
   <license>BSD</license>
 
-  <url type="website">http://ros.org/wiki/imu_transformer</url>
-  <url type="bugtracker">https://github.com/ros-perception/imu_transformer/issues</url>
-  <url type="repository">https://github.com/ros-perception/imu_transformer</url>
+  <url type="website">http://ros.org/wiki/imu_pipeline</url>
+  <url type="bugtracker">https://github.com/ros-perception/imu_pipeline/issues</url>
+  <url type="repository">https://github.com/ros-perception/imu_pipeline</url>
 
   <author>Chad Rockey</author>
 
