@@ -1,13 +1,13 @@
 <package>
-  <description brief="imu_transformer">
+  <description brief="imu_pipeline">
 
-     imu_transformer
+     imu_pipeline
 
   </description>
   <author>Chad Rockey</author>
   <license>BSD</license>
   <review status="unreviewed" notes="" />
-  <url>http://ros.org/wiki/imu_transformer</url>
+  <url>http://ros.org/wiki/imu_pipeline</url>
   <depend package="sensor_msgs" />
   <depend package="tf" />
 
