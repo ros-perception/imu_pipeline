@@ -1,0 +1,23 @@
+<package>
+  <name>imu_transformer</name>
+  <version>0.1.0</version>
+  <description>imu_transformer</description>
+  <maintainer email="chadrockey@willowgarage.com">Chad Rockey</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">http://ros.org/wiki/imu_transformer</url>
+  <url type="bugtracker">https://github.com/ros-perception/imu_transformer/issues</url>
+  <url type="repository">https://github.com/ros-perception/imu_transformer</url>
+
+  <author>Chad Rockey</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>tf</build_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>tf</run_depend>
+</package>

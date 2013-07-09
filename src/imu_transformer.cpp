@@ -32,6 +32,7 @@
  */
 
 #include <ros/ros.h>
+#include <tf/tf.h>
 #include <tf/transform_listener.h>
 #include <tf/message_filter.h>
 #include <message_filters/subscriber.h>
@@ -47,14 +48,14 @@ boost::shared_ptr<tf::TransformListener> listener_;
 std::string target_frame_id_;
 
 void transformCovariance(const boost::array<double, 9>& in, boost::array<double, 9>& out, const tf::StampedTransform& transform){
-	btMatrix3x3 cov_in(in[0], in[1], in[2],
+	tf::Matrix3x3 cov_in(in[0], in[1], in[2],
     				   in[3], in[4], in[5],
     				   in[6], in[7], in[8]);
 
-	btMatrix3x3 rot(transform.getRotation().asBt());
-    btMatrix3x3 cov_out = rot*cov_in*(rot.transpose());
+	tf::Matrix3x3 rot(transform.getRotation());
+    tf::Matrix3x3 cov_out = rot*cov_in*(rot.transpose());
     for(size_t i = 0; i < 3; i++){
-    	btVector3 row = cov_out.getRow(i);
+    	tf::Vector3 row = cov_out.getRow(i);
     	out[3*i] = row.getX();
     	out[3*i+1] = row.getY();
     	out[3*i+2] = row.getZ();
