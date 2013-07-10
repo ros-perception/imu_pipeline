@@ -9,3 +9,8 @@ imu_integrator
 ==============
 
 Simple planar imu integration tool.
+
+imu_bias_remover
+================
+
+Tool to recalibrate imu bias based on /cmd_vel or /odom
