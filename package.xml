@@ -1,6 +1,6 @@
 <package>
   <name>imu_pipeline</name>
-  <version>0.1.0</version>
+  <version>0.1.1</version>
   <description>imu_pipeline</description>
   <maintainer email="chadrockey@willowgarage.com">Chad Rockey</maintainer>
 
