@@ -24,13 +24,11 @@
 # 
 
 import rospy
-import tf
+from tf.transformations import *
 from sensor_msgs.msg  import Imu
 
 import math
 from numpy import *
-from tf.transformations import *
-
 
 def quaterion_between_vectors(u, v):
   # Finds the shortest rotation between two vectors
@@ -43,117 +41,85 @@ def quaterion_between_vectors(u, v):
   u_norm = linalg.norm(u)
   v_norm = linalg.norm(v)
   u /= u_norm
-  v /= v_norm
-  
-  # Calculate W
-  q = []
-  q.append(sqrt(1) + dot(u, v))
+  v /= v_norm  
   
   # Calculate xyz
   a = cross(u, v)
+  
+  q = []
   q.append(a[0])
   q.append(a[1])
   q.append(a[2])
+  
+  # Calculate W
+  q.append(1 + dot(u, v))
   
   # Normalize q
   q  = array(q)
   q /= linalg.norm(q)
   
   return q
+
+
+def rotate_point(Q, p):
+  return quaternion_multiply(quaternion_multiply(Q, p), quaternion_conjugate(Q))
   
   
-def quaterion_from_angles(R):
-  # Finds a quaternion from rotations about each axis
-  
-  xaxis, yaxis, zaxis = [1, 0, 0], [0, 1, 0], [0, 0, 1]
-  
-  qx = quaternion_about_axis(R[0], xaxis)
-  qy = quaternion_about_axis(R[1], yaxis)
-  qz = quaternion_about_axis(R[2], zaxis)
-  
-  q = qx
-  q = quaternion_multiply(q, qy)
-  q = quaternion_multiply(q, qz) 
-
-  # transformation.py stores w at the end of the list 
-  q = array([ q[3], q[0], q[1], q[2] ])
-
-  return q
-
-
-def quaternion_avg(q1, q2, w1):
-  
-  q = w1 * q1 + (1 - w1) * q2  
-  
-  return q / linalg.norm(q)
-
-
-def tf_quaternion_to_numpy_quarternion(q):
-  return array([ q[3], q[0], q[1], q[2] ])
-
-
 # Filter the messages   
-def sub_gyroCB(msg_in): 
+def sub_imuCB(msg_in): 
   global pub_imu
-  
-  global msg_prev
   global Q
-    
-  # Time difference
-  if (msg_prev is None):
-    dT = 0
-  else:
-    T1 = msg_prev.header.stamp
-    T2 = msg_in.header.stamp
-    dT = abs((T1 - T2).to_sec())
   
-  # Gyro sensor vector
-  x = msg_in.angular_velocity.x 
-  y = msg_in.angular_velocity.y
-  z = msg_in.angular_velocity.z
-  sg = array([x, y, z])
+  # Current rotation from world frame (_wf) to sensor frame (_sf)
+  Q_wf2sf = quaternion_inverse(Q)
+  Q_sf2wf = Q
   
-  # Gyro Integration
-  qg = quaterion_from_angles(sg * dT)
+  # Gravity vector in world frame 
+  g_wf = array([0, 0, 9.8, 0]) 
   
-  
-  # Gravity Vector
-  g  = array([0, 0, 9.8]) 
-  
-  # Accel sensor vector
+  # Sensor vector in sensor frame 
   x = msg_in.linear_acceleration.x 
   y = msg_in.linear_acceleration.y
   z = msg_in.linear_acceleration.z
-  a = array([x, y, z])
+  s_sf = array([x, y, z, 0])
   
-  # Find a rotation between the sensor 
-  # vector and the gravity vector
-  qa = quaterion_between_vectors(a, g)
   
-  Q = quaternion_slerp(qg, qa, 0.5)
+  # Find the gravity vector in the sensor frame
+  g_sf = rotate_point(Q_wf2sf, g_wf)
+  
+  # Find the sensor data in the world frame
+  s_wf = rotate_point(Q_sf2wf, s_sf)
+  
+  #print s_sf[:3], g_wf[:3]
+    
+  q = quaterion_between_vectors(s_wf[:3], g_wf[:3])
+  Q = quaternion_multiply(q, Q)
+  print q
+  
   
   # Publish
-  msg_in.orientation.w = Q[0]
-  msg_in.orientation.x = Q[1]
-  msg_in.orientation.y = Q[2]
-  msg_in.orientation.z = Q[3]
+  msg_in.orientation.x = Q[0]
+  msg_in.orientation.y = Q[1]
+  msg_in.orientation.z = Q[2]
+  msg_in.orientation.w = Q[3]
   pub_imu.publish(msg_in)
 
-  
 
 if __name__ == '__main__':
   global pub_imu
-  global msg_prev
   global Q
   
-  msg_prev = None
-  Q = zeros(4)
+  Q = array([0, 0, 0, 1])
+  Q = quaternion_about_axis(pi/4, [1, 1, 0])
+    
+  set_printoptions(precision=3)
+  set_printoptions(suppress=True)
   
-  rospy.init_node('orient_simple')
+  rospy.init_node('orient_accel')
    
-  pub_imu  = rospy.Publisher("/imu/orient_simple", Imu)
+  pub_imu  = rospy.Publisher("/imu/orient", Imu)
   
-  rospy.Subscriber("/imu/trim",  Imu,  sub_ImuCB)
+  rospy.Subscriber("/imu/trim", Imu,  sub_imuCB)
   rospy.spin()
   
   

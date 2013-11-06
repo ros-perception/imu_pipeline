@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # 
-# Orientation Filter - Accelerometer data only
+# Orientation Filter - Gyroscope data only
 #
 # Copyright (c) 2013 Dereck Wonnacott <dereck@gmail.com>
 # 
@@ -24,78 +24,79 @@
 # 
 
 import rospy
-import tf
 from sensor_msgs.msg  import Imu
-
+from tf.transformations import *
 import math
 from numpy import *
 
-def quaterion_between_vectors(u, v):
-  # Finds the shortest rotation between two vectors
-  # expressed as a Quarternion. Note that there are
-  # many solutions at u = -v, so this causes some 
-  # weird behavior due to the fact we have no rotation
-  # constraint about the vectors.
+
+def quaterion_from_angles(R):
+  # Finds a quaternion from rotations about each axis
   
-  # Normalize input vectors
-  u_norm = linalg.norm(u)
-  v_norm = linalg.norm(v)
-  u /= u_norm
-  v /= v_norm
+  xaxis, yaxis, zaxis = [1, 0, 0], [0, 1, 0], [0, 0, 1]
   
-  print array(u), array(v)
+  qx = quaternion_about_axis(R[0], xaxis)
+  qy = quaternion_about_axis(R[1], yaxis)
+  qz = quaternion_about_axis(R[2], zaxis)
   
-  # Calculate W
-  q = []
-  q.append(1 + dot(u, v))
-  
-  # Calculate xyz
-  a = cross(u, v)
-  q.append(a[0])
-  q.append(a[1])
-  q.append(a[2])
-  
-  # Normalize q
-  q  = array(q)
-  q /= linalg.norm(q)
-  
+  q = qx
+  q = quaternion_multiply(q, qy)
+  q = quaternion_multiply(q, qz)
+
   return q
+
   
 # Filter the messages   
 def sub_imuCB(msg_in): 
-  global pub_imu
-  
-  # Gravity Vector
-  g  = array([0, 0, 9.8]) 
-  
+  global pub_imu  
+  global msg_prev
+  global Q
+    
   # Sensor vector
-  x = msg_in.linear_acceleration.x 
-  y = msg_in.linear_acceleration.y
-  z = msg_in.linear_acceleration.z
+  x = msg_in.angular_velocity.x 
+  y = msg_in.angular_velocity.y
+  z = msg_in.angular_velocity.z
   s = array([x, y, z])
+
+  # Time difference
+  if (msg_prev is None):
+    dT = 0
+  else:
+    T1 = msg_prev.header.stamp
+    T2 = msg_in.header.stamp
+    dT = abs((T1 - T2).to_sec())
   
-  # Find a rotation between the sensor 
-  # vector and the gravity vector
-  q = quaterion_between_vectors(s, g)
+  # Translate to Quarternion  
+  q = quaterion_from_angles(s * dT)
+  
+  # Integration
+  Q = quaternion_multiply(Q, q)
   
   # Publish
-  msg_in.orientation.w = q[0]
-  msg_in.orientation.x = q[1]
-  msg_in.orientation.y = q[2]
-  msg_in.orientation.z = q[3]
+  msg_prev = msg_in
+  msg_in.orientation.w = Q[3]
+  msg_in.orientation.x = Q[0]
+  msg_in.orientation.y = Q[1]
+  msg_in.orientation.z = Q[2]
   pub_imu.publish(msg_in)
 
 
 if __name__ == '__main__':
   global pub_imu
   
+  global msg_prev
+  global Q
+  
+  msg_prev = None
+  Q = array([0, 0, 0, 1])
+  
   set_printoptions(precision=4)
   
-  rospy.init_node('orient_accel')
+  rospy.init_node('orient_gyro')
    
-  pub_imu  = rospy.Publisher("/imu/orient_accel", Imu)
+  pub_imu  = rospy.Publisher("/imu/orient", Imu)
   
-  rospy.Subscriber("/imu/trim", Imu,  sub_imuCB)
+  rospy.Subscriber("/imu/bias", Imu,  sub_imuCB)
   rospy.spin()
   
   

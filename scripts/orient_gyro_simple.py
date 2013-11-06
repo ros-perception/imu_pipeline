@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # 
-# Orientation Filter - Gyroscope data only
+# Orientation Filter - Gyroscope data only (Angle based)
 #
 # Copyright (c) 2013 Dereck Wonnacott <dereck@gmail.com>
 # 
@@ -41,10 +41,7 @@ def quaterion_from_angles(R):
   
   q = qx
   q = quaternion_multiply(q, qy)
-  q = quaternion_multiply(q, qz) 
-
-  # transformation.py stores w at the end of the list 
-  q = array([ q[3], q[0], q[1], q[2] ])
+  q = quaternion_multiply(q, qz)
 
   return q
 
@@ -80,10 +77,10 @@ def sub_imuCB(msg_in):
   
   # Publish
   msg_prev = msg_in
-  msg_in.orientation.w = q[0]
-  msg_in.orientation.x = q[1]
-  msg_in.orientation.y = q[2]
-  msg_in.orientation.z = q[3]
+  msg_in.orientation.w = q[3]
+  msg_in.orientation.x = q[0]
+  msg_in.orientation.y = q[1]
+  msg_in.orientation.z = q[2]
   pub_imu.publish(msg_in)
 
 

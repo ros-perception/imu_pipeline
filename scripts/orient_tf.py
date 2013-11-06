@@ -52,7 +52,7 @@ if __name__ == '__main__':
   
   br = tf.TransformBroadcaster() 
   
-  rospy.Subscriber("/imu/orient_simple", Imu,  sub_imuCB)
+  rospy.Subscriber("/imu/orient", Imu,  sub_imuCB)
   rospy.spin()
   
   
