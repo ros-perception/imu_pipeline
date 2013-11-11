@@ -61,11 +61,7 @@ def quaterion_between_vectors(u, v):
   
   # Calculate xyz 
   # (Axis of rotation is normal to both vectors)
-  a = cross(u, v)
-  q = [0, 0, 0]
-  q[0] = a[0]
-  q[1] = a[1]
-  q[2] = a[2]  
+  q = cross(u, v)
   
   # Calculate W
   # (The half-angle between both vectors)
