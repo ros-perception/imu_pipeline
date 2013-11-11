@@ -39,8 +39,8 @@ def sub_imuCB(msg_in):
                     msg_in.orientation.y, 
                     msg_in.orientation.z, 
                     msg_in.orientation.w ),
-                   rospy.Time.now(),
-                   "imu",     # child
+                   msg_in.header.stamp,
+                   msg_in.header.frame_id,     # child
                    "world"    # parent
                   )
 

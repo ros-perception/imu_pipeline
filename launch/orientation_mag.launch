@@ -1,0 +1,10 @@
+<launch>
+
+  <node pkg="imu_pipeline" type="cal_gyro_bias.py"  name="ip1" output="screen"/>
+  <node pkg="imu_pipeline" type="cal_accel_trim.py" name="ip2" output="screen"/>
+  <node pkg="imu_pipeline" type="orient_mag.py"     name="ip3" output="screen"/>
+  <node pkg="imu_pipeline" type="orient_tf.py"      name="ip4" output="screen"/>
+	
+</launch>
+
+

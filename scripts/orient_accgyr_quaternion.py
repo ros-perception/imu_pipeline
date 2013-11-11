@@ -59,15 +59,12 @@ def quaterion_between_vectors(u, v):
   u /= u_norm
   v /= v_norm  
   
-  # Calculate xyz
-  a = cross(u, v)
-  
-  q = []
-  q.append(a[0])
-  q.append(a[1])
-  q.append(a[2])
+  # Calculate xyz 
+  # (Axis of rotation is normal to both vectors)
+  q = cross(u, v)
   
   # Calculate W
+  # (The half-angle between both vectors)
   q.append(1 + dot(u, v))
   
   # Normalize q
@@ -78,6 +75,7 @@ def quaterion_between_vectors(u, v):
 
 
 def rotate_point(Q, p):
+  # P = Q * p * Q ** -1
   return quaternion_multiply(quaternion_multiply(Q, p), quaternion_conjugate(Q))
   
 

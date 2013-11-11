@@ -24,4 +24,5 @@
   <run_depend>geometry_msgs</run_depend>
   <run_depend>nav_msgs</run_depend>
   <run_depend>tf</run_depend>
+  <run_depend>python_msg_conversions</run_depend>
 </package>
