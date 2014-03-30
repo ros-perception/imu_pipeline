@@ -2,6 +2,9 @@
 Changelog for package imu_pipeline
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.3 (2014-03-30)
+------------------
+
 0.1.1 (2013-07-29)
 ------------------
 * Added tool to null out gyro bias based on cmd_vel or odom.
