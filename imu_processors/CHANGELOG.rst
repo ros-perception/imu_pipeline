@@ -1,0 +1,18 @@
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package imu_processors
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+0.1.3 (2014-03-30)
+------------------
+
+0.1.1 (2013-07-29)
+------------------
+* Added tool to null out gyro bias based on cmd_vel or odom.
+* Merge branch 'hydro-devel' of https://github.com/ros-perception/imu_pipeline into hydro-devel
+* Added imu_integrator.
+* Merge pull request `#2 <https://github.com/ros-perception/imu_pipeline/issues/2>`_ from ros-perception/groovy-devel
+  Updated packaged name to imu_pipeline
+* Updated packaged name to imu_pipeline
+* Catkinized, updated for Groovy.
+* Initial github commit
+* Initial commit

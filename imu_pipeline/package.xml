@@ -1,0 +1,25 @@
+<package>
+  <name>imu_pipeline</name>
+  <version>0.1.3</version>
+  <description>imu_pipeline</description>
+
+  <license>BSD</license>
+  <license>GPL</license>
+
+  <url type="website">http://ros.org/wiki/imu_pipeline</url>
+  <url type="bugtracker">https://github.com/ros-perception/imu_pipeline/issues</url>
+  <url type="repository">https://github.com/ros-perception/imu_pipeline</url>
+
+  <author email="chadrockey@gmail.com">Chad Rockey</author>
+  <maintainer email="chadrockey@gmail.com">Chad Rockey</maintainer>
+  <maintainer email="pbovbel@clearpathrobotics.com">Paul Bovbel</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>imu_processors</run_depend>
+  <run_depend>imu_transformer</run_depend>
+
+  <export>
+    <metapackage/>
+  </export>
+</package>
