@@ -1,6 +1,6 @@
 <package>
   <name>imu_pipeline</name>
-  <version>0.1.3</version>
+  <version>0.1.4</version>
   <description>imu_pipeline</description>
 
   <license>BSD</license>

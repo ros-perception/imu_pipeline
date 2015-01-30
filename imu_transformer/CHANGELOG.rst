@@ -2,8 +2,8 @@
 Changelog for package imu_transformer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.4 (2015-01-30)
+------------------
 * Add imu_transformer node/nodelet combination using tf2
 * Contributors: Paul Bovbel
 
