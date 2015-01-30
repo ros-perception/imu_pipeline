@@ -2,13 +2,10 @@
 Changelog for package imu_processors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.1.4 (2015-01-30)
+0.2.0 (2015-01-30)
 ------------------
 * Move misc processors into imu_processors
 * Contributors: Paul Bovbel
-
-0.1.3 (2014-03-30)
-------------------
 
 0.1.1 (2013-07-29)
 ------------------
