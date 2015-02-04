@@ -2,6 +2,9 @@
 Changelog for package imu_processors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.2.0 (2015-01-30)
 ------------------
 * Move misc processors into imu_processors
