@@ -2,8 +2,8 @@
 Changelog for package imu_transformer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.1 (2015-02-04)
+------------------
 * Fix nodelet install
 * Contributors: Paul Bovbel
 
