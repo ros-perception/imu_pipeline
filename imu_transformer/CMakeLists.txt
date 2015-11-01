@@ -31,7 +31,9 @@ target_link_libraries(imu_transformer_nodelet ${catkin_LIBRARIES})
 add_executable(imu_transformer_node src/imu_transformer_node.cpp)
 target_link_libraries(imu_transformer_node ${catkin_LIBRARIES})
 
-roslaunch_add_file_check(launch)
+if(CATKIN_ENABLE_TESTING)
+  roslaunch_add_file_check(launch)
+endif()
 
 install(TARGETS imu_transformer_node imu_transformer_nodelet
 	RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
