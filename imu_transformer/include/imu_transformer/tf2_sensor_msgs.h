@@ -66,7 +66,8 @@ namespace tf2
 * Transforms a covariance array from one frame to another
 */
   inline
-  void transformCovariance(const boost::array<double, 9>& in, boost::array<double, 9>& out, Eigen::Quaternion<double> r){
+  void transformCovariance(const boost::array<double, 9>& in, boost::array<double, 9>& out, Eigen::Quaternion<double> r)
+  {
 
     Eigen::Map<const Eigen::Matrix<double, 3, 3, Eigen::RowMajor> > cov_in(in.data());
     Eigen::Map<Eigen::Matrix<double, 3, 3, Eigen::RowMajor> > cov_out(out.data());
@@ -79,7 +80,8 @@ namespace tf2
 */
   template <>
   inline
-  void doTransform(const sensor_msgs::Imu &imu_in, sensor_msgs::Imu &imu_out, const geometry_msgs::TransformStamped& t_in)
+  void doTransform(const sensor_msgs::Imu &imu_in, sensor_msgs::Imu &imu_out,
+                   const geometry_msgs::TransformStamped& t_in)
   {
 
     imu_out.header = t_in.header;
@@ -155,7 +157,8 @@ namespace tf2
 */
   template <>
   inline
-  void doTransform(const sensor_msgs::MagneticField &mag_in, sensor_msgs::MagneticField &mag_out, const geometry_msgs::TransformStamped& t_in)
+  void doTransform(const sensor_msgs::MagneticField &mag_in, sensor_msgs::MagneticField &mag_out,
+                   const geometry_msgs::TransformStamped& t_in)
   {
 
     mag_out.header = t_in.header;

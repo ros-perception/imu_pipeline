@@ -17,6 +17,46 @@ namespace imu_transformer
 
     private_nh_.param<std::string>("target_frame", target_frame_, "base_link");
 
+    private_nh_.param<bool>("convert_ned_to_enu", convert_ned_to_enu_, false);
+
+    if (private_nh_.getParam("source_frame", source_frame_map_))
+    {
+      private_nh_.getParam("source_frame", source_frame_map_);
+      if (source_frame_map_["local"].empty() || source_frame_map_["global"].empty())
+      {
+        NODELET_ERROR("Both a local and global frame must be specified");
+        ROS_ASSERT(!(source_frame_map_["local"].empty() || source_frame_map_["global"].empty()));
+      }
+      else
+      {
+        private_nh_.getParam("source_frame", source_frame_map_);
+
+        NODELET_INFO("Global frame: %s", source_frame_map_["global"].c_str());
+        NODELET_INFO("Local frame: %s", source_frame_map_["local"].c_str());
+      }
+    }
+    else if (convert_ned_to_enu_)
+    {
+      source_frame_map_["local"] = "imu_link_ned_local";
+      source_frame_map_["global"] = "imu_link_ned_global";
+
+      NODELET_INFO("Global frame: %s", source_frame_map_["global"].c_str());
+      NODELET_INFO("Local frame: %s", source_frame_map_["local"].c_str());
+    }
+    else if (private_nh_.getParam("source_frame", source_frame_map_["global"]))
+    {
+      source_frame_map_["local"] = source_frame_map_["global"];
+
+      NODELET_INFO("Source frame: %s", source_frame_map_["global"].c_str());
+    }
+    else
+    {
+      source_frame_map_["local"] = "";
+      source_frame_map_["global"] = "";
+
+      NODELET_INFO("Using source frame from incoming messages");
+    }
+
     tf2_.reset(new tf2_ros::Buffer());
     tf2_listener_.reset(new tf2_ros::TransformListener(*tf2_));
 
@@ -36,14 +76,37 @@ namespace imu_transformer
 
   void ImuTransformerNodelet::imuCallback(const ImuMsg::ConstPtr &imu_in)
   {
-    if(imu_pub_.getTopic().empty()){
+    if (imu_pub_.getTopic().empty())
+    {
       imu_pub_ = nh_out_.advertise<ImuMsg>("data", 10);
     }
 
     try
     {
       ImuMsg imu_out;
-      tf2_->transform(*imu_in, imu_out, target_frame_);
+
+      if (source_frame_map_["local"].empty() && source_frame_map_["global"].empty())
+      {
+        tf2_->transform(*imu_in, imu_out, target_frame_);
+      }
+      else if (source_frame_map_["global"] == source_frame_map_["local"])
+      {
+        ImuMsg imu_src;
+        imu_src = *imu_in;
+        imu_src.header.frame_id = source_frame_map_["global"];
+        tf2_->transform(imu_src, imu_out, target_frame_);
+      }
+      else
+      {
+        ImuMsg imu_local, imu_global;
+        imu_local = imu_global = *imu_in;
+        imu_global.header.frame_id = source_frame_map_["global"];
+        imu_local.header.frame_id = source_frame_map_["local"];
+        tf2_->transform(imu_global, imu_global, target_frame_);
+        tf2_->transform(imu_local, imu_local, target_frame_);
+        joinImuMsgs(imu_global, imu_local, imu_out);
+      }
+
       imu_pub_.publish(imu_out);
     }
     catch (tf2::TransformException ex)
@@ -63,21 +126,26 @@ namespace imu_transformer
     {
       MagMsg::ConstPtr mag_in = msg->instantiate<MagMsg>();
 
-      if(tf2_->canTransform(target_frame_, mag_in->header.frame_id, mag_in->header.stamp, &error)){
+      if (tf2_->canTransform(target_frame_, mag_in->header.frame_id, mag_in->header.stamp, &error))
+      {
 
-        if(mag_pub_.getTopic().empty()){
+        if (mag_pub_.getTopic().empty())
+        {
           mag_pub_ = nh_out_.advertise<MagMsg>("mag", 10);
         }
 
         MagMsg out;
         tf2_->transform(*mag_in, out, target_frame_);
         mag_pub_.publish(out);
-      }else{
+      }
+      else
+      {
         NODELET_WARN_STREAM_THROTTLE(1.0, error);
       }
       return;
     }
-    catch (topic_tools::ShapeShifterException &e) {
+    catch (topic_tools::ShapeShifterException &e)
+    {
       NODELET_DEBUG_STREAM(e.what());
     }
 
@@ -85,9 +153,10 @@ namespace imu_transformer
     {
       geometry_msgs::Vector3Stamped::ConstPtr mag_in = msg->instantiate<geometry_msgs::Vector3Stamped>();
 
-      if(tf2_->canTransform(target_frame_, mag_in->header.frame_id, mag_in->header.stamp, &error)){
+      if (tf2_->canTransform(target_frame_, mag_in->header.frame_id, mag_in->header.stamp, &error)){
 
-        if(mag_pub_.getTopic().empty()){
+        if (mag_pub_.getTopic().empty())
+        {
           mag_pub_ = nh_out_.advertise<geometry_msgs::Vector3Stamped>("mag", 10);
         }
 
@@ -101,12 +170,15 @@ namespace imu_transformer
         mag_out.vector = mag_temp_out.magnetic_field;
 
         mag_pub_.publish(mag_out);
-      }else{
+      }
+      else
+      {
         NODELET_WARN_STREAM_THROTTLE(1.0, error);
       }
       return;
     }
-    catch (topic_tools::ShapeShifterException &e) {
+    catch (topic_tools::ShapeShifterException &e)
+    {
       NODELET_DEBUG_STREAM(e.what());
     }
 
@@ -117,10 +189,21 @@ namespace imu_transformer
 
   void ImuTransformerNodelet::failureCb(tf2_ros::filter_failure_reasons::FilterFailureReason reason)
   {
-    NODELET_WARN_STREAM_THROTTLE(1.0, "Can't transform incoming IMU data to " << target_frame_ << " " << 
+    NODELET_WARN_STREAM_THROTTLE(1.0, "Can't transform incoming IMU data to " << target_frame_ << " " <<
         reason);
+  }
+
+  void ImuTransformerNodelet::joinImuMsgs(const sensor_msgs::Imu &imu_global, const sensor_msgs::Imu &imu_local, sensor_msgs::Imu &imu_out)
+  {
+    imu_out.orientation = imu_global.orientation;
+    imu_out.orientation_covariance = imu_global.orientation_covariance;
+    imu_out.angular_velocity = imu_local.angular_velocity;
+    imu_out.angular_velocity_covariance = imu_local.angular_velocity_covariance;
+    imu_out.linear_acceleration = imu_local.linear_acceleration;
+    imu_out.linear_acceleration_covariance = imu_local.linear_acceleration_covariance;
   }
 
 }
 
-PLUGINLIB_DECLARE_CLASS(imu_transformer, ImuTransformerNodelet, imu_transformer::ImuTransformerNodelet, nodelet::Nodelet);
+PLUGINLIB_DECLARE_CLASS(imu_transformer, ImuTransformerNodelet,
+                        imu_transformer::ImuTransformerNodelet, nodelet::Nodelet);

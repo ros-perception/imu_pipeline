@@ -11,6 +11,7 @@
 #include "message_filters/subscriber.h"
 #include "topic_tools/shape_shifter.h"
 
+#include <map>
 #include <string>
 
 namespace imu_transformer
@@ -32,6 +33,8 @@ namespace imu_transformer
   private:
 
     std::string target_frame_;
+    std::map <std::string, std::string> source_frame_map_;
+    bool convert_ned_to_enu_;
 
     ros::NodeHandle nh_in_, nh_out_, private_nh_;
     boost::shared_ptr<tf2_ros::Buffer> tf2_;
@@ -50,6 +53,7 @@ namespace imu_transformer
 //    void magCallback(const MagMsg::ConstPtr &mag_in);
     void magCallback(const topic_tools::ShapeShifter::ConstPtr &msg);
     void failureCb(tf2_ros::filter_failure_reasons::FilterFailureReason reason);
+    void joinImuMsgs(const sensor_msgs::Imu &imu_global, const sensor_msgs::Imu &imu_local, sensor_msgs::Imu &imu_out);
 
   };
 
