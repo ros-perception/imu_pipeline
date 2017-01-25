@@ -1,6 +1,6 @@
 <package>
   <name>imu_processors</name>
-  <version>0.2.1</version>
+  <version>0.2.2</version>
   <description>Processors for sensor_msgs::Imu data</description>
 
   <license>BSD</license>
