@@ -12,6 +12,7 @@
 
   <author email="pbovbel@clearpathrobotics.com">Paul Bovbel</author>
   <maintainer email="pbovbel@clearpathrobotics.com">Paul Bovbel</maintainer>
+  <maintainer email="tbaltovski@clearpathrobotics.com">Tony Baltovski</maintainer>
 
   <buildtool_depend>catkin</buildtool_depend>
 
@@ -20,7 +21,7 @@
   <build_depend>message_filters</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>roslaunch</build_depend>
-  <build_depend>sensor_msgs</build_depend>  
+  <build_depend>sensor_msgs</build_depend>
   <build_depend>tf2</build_depend>
   <build_depend>tf2_ros</build_depend>
   <build_depend>tf2_sensor_msgs</build_depend>

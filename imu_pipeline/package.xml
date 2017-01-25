@@ -12,6 +12,7 @@
 
   <author email="chadrockey@gmail.com">Chad Rockey</author>
   <maintainer email="pbovbel@clearpathrobotics.com">Paul Bovbel</maintainer>
+  <maintainer email="tbaltovski@clearpathrobotics.com">Tony Baltovski</maintainer>
 
   <buildtool_depend>catkin</buildtool_depend>
 
