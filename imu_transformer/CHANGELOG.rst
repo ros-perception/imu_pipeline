@@ -2,6 +2,11 @@
 Changelog for package imu_transformer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* imu_transformer: Fix build with CATKIN_ENABLE_TESTIING=OFF
+* Contributors: Alexis Ballier
+
 0.2.1 (2015-02-04)
 ------------------
 * Fix nodelet install
