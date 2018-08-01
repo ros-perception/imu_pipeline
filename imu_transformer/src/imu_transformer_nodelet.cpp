@@ -123,4 +123,4 @@ namespace imu_transformer
 
 }
 
-PLUGINLIB_DECLARE_CLASS(imu_transformer, ImuTransformerNodelet, imu_transformer::ImuTransformerNodelet, nodelet::Nodelet);
+PLUGINLIB_EXPORT_CLASS(imu_transformer::ImuTransformerNodelet, nodelet::Nodelet)
