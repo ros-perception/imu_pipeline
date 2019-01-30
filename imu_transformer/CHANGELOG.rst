@@ -2,8 +2,8 @@
 Changelog for package imu_transformer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.3 (2019-01-30)
+------------------
 * update to use non deprecated pluginlib macro
 * Updated maintainers.
 * Contributors: Mikael Arguedas, Tony Baltovski
