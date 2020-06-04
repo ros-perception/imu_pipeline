@@ -2,6 +2,12 @@
 Changelog for package imu_transformer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Bump CMake version to avoid CMP0048 warning.
+* Updated to package.xml format 2.
+* Contributors: Tony Baltovski
+
 0.2.3 (2019-01-30)
 ------------------
 * update to use non deprecated pluginlib macro
