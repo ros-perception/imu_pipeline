@@ -2,8 +2,8 @@
 Changelog for package imu_transformer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.0 (2020-06-04)
+------------------
 * Bump CMake version to avoid CMP0048 warning.
 * Updated to package.xml format 2.
 * Contributors: Tony Baltovski

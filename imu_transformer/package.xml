@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>imu_transformer</name>
-  <version>0.2.3</version>
+  <version>0.3.0</version>
   <description>Node/nodelet combination to transform sensor_msgs::Imu data from one frame into another.</description>
 
   <license>GPL</license>
