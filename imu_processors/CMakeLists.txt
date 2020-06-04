@@ -1,5 +1,5 @@
 # http://ros.org/doc/groovy/api/catkin/html/user_guide/supposed.html
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0.2)
 project(imu_processors)
 
 # Load catkin and all dependencies required for this package
@@ -7,7 +7,7 @@ find_package(catkin REQUIRED roscpp sensor_msgs geometry_msgs nav_msgs tf)
 
 catkin_package(
   INCLUDE_DIRS
-  LIBRARIES 
+  LIBRARIES
   CATKIN_DEPENDS roscpp sensor_msgs geometry_msgs nav_msgs tf
 )
 
