@@ -2,6 +2,12 @@
 Changelog for package imu_transformer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* imu_transformer: Fix transformation of the orientation of IMU.
+  The previous computation was wrong. According to REP-145, IMU orientation should express attitude of the sensor frame in a world frame. imu_transformer changes the sensor frame, so it should just recompute the new attitude by transforming the old sensor frame into the new one.
+* Contributors: Martin Pecka
+
 0.3.0 (2020-06-04)
 ------------------
 * Bump CMake version to avoid CMP0048 warning.

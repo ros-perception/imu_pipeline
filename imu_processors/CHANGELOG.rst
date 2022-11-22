@@ -2,6 +2,9 @@
 Changelog for package imu_processors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.3.0 (2020-06-04)
 ------------------
 * Bump CMake version to avoid CMP0048 warning.
