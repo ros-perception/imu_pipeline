@@ -2,8 +2,8 @@
 Changelog for package imu_pipeline
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.4 (2022-11-22)
+------------------
 * Updated to package.xml format 2.
 * Contributors: Tony Baltovski
 
