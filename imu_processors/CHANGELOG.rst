@@ -2,6 +2,11 @@
 Changelog for package imu_processors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Updated to package.xml format 2.
+* Contributors: Tony Baltovski
+
 0.2.3 (2019-01-30)
 ------------------
 * Updated maintainers.
