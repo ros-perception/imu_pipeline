@@ -24,12 +24,12 @@ find_package(tf2_sensor_msgs REQUIRED)
   #CATKIN_DEPENDS roscpp message_filters nodelet sensor_msgs tf2 tf2_ros geometry_msgs topic_tools
 #)
 
-#include_directories(
-  #include
+include_directories(
+  include
   #${catkin_INCLUDE_DIRS}
-#)
+)
 
-add_executable(imu_transformer_node src/imu_transformer_node.cpp)
+add_executable(imu_transformer_node src/imu_transformer_node.cpp src/imu_transformer.cpp)
 #target_link_libraries(imu_transformer_node ${catkin_LIBRARIES})
 ament_target_dependencies(imu_transformer_node rclcpp sensor_msgs geometry_msgs tf2 tf2_ros tf2_sensor_msgs)
 
