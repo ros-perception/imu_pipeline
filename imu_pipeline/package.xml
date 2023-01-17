@@ -1,4 +1,6 @@
-<package format="2">
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>imu_pipeline</name>
   <version>0.3.1</version>
   <description>imu_pipeline</description>
@@ -14,12 +16,12 @@
   <maintainer email="pbovbel@clearpathrobotics.com">Paul Bovbel</maintainer>
   <maintainer email="tbaltovski@clearpathrobotics.com">Tony Baltovski</maintainer>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <exec_depend>imu_processors</exec_depend>
+  <!--<exec_depend>imu_processors</exec_depend>-->
   <exec_depend>imu_transformer</exec_depend>
 
   <export>
-    <metapackage/>
+    <build_type>ament_cmake</build_type>
   </export>
 </package>
