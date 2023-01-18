@@ -25,13 +25,26 @@ include_directories(
 add_executable(imu_transformer_node src/imu_transformer_node.cpp src/imu_transformer.cpp)
 ament_target_dependencies(imu_transformer_node rclcpp sensor_msgs geometry_msgs tf2 tf2_ros tf2_sensor_msgs)
 
-#if(BUILD_TESTING)
-  #find_package(tf2_geometry_msgs REQUIRED)
-  #find_package(ament_cmake_gtest REQUIRED)
+if(BUILD_TESTING)
+  find_package(tf2_geometry_msgs REQUIRED)
+  find_package(ament_cmake_gtest REQUIRED)
 
-  #ament_add_gtest(test_imu_transforms test/test_imu_transforms.cpp)
-  #ament_target_dependencies(test_imu_transforms sensor_msgs geometry_msgs tf2 tf2_ros tf2_sensor_msgs)
-#endif()
+  ament_add_gtest(test_imu_transforms test/test_imu_transforms.cpp)
+  ament_target_dependencies(test_imu_transforms sensor_msgs geometry_msgs tf2 tf2_ros tf2_sensor_msgs)
+
+  install(
+      TARGETS
+      test_imu_transforms
+      DESTINATION share/${PROJECT_NAME}
+  )
+
+  # Install test launch config files.
+  install(DIRECTORY
+    test
+    DESTINATION share/${PROJECT_NAME}
+    USE_SOURCE_PERMISSIONS
+  )
+endif()
 
 install(TARGETS
   imu_transformer_node

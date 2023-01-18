@@ -33,8 +33,8 @@
 #define TF2_SENSOR_MSGS_H
 
 #include <tf2/convert.h>
-#include <sensor_msgs/msg/imu.h>
-#include <sensor_msgs/msg/magnetic_field.h>
+#include <sensor_msgs/msg/imu.hpp>
+#include <sensor_msgs/msg/magnetic_field.hpp>
 #include <Eigen/Eigen>
 #include <Eigen/Geometry>
 

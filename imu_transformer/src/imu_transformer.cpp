@@ -1,5 +1,4 @@
 #include <imu_transformer/imu_transformer.hpp>
-#include <geometry_msgs/msg/vector3_stamped.hpp>
 
 //#include "tf2_sensor_msgs/tf2_sensor_msgs.h"
 //Remove this header when https://github.com/ros/geometry_experimental/pull/78 is released
