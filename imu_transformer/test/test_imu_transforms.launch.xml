@@ -12,16 +12,12 @@
      The orientation in the output of this command should match the orientation that is output in imu_out/data - which
      should be orientation of the imu_link_ned frame in the world frame. -->
 
-<!--
-    <arg name="rviz" default="true" />
-    -->
     <node pkg="tf2_ros" exec="static_transform_publisher" args="0.7 0 0 1.5708 0 0 world imu_link" />
     <node pkg="tf2_ros" exec="static_transform_publisher" args="0.5 0.5 0 1.5708 0 3.1416 imu_link imu_link_ned" />
     <node name="transformer" pkg="imu_transformer" exec="imu_transformer_node">
         <param name="target_frame" value="imu_link_ned" />
     </node>
-    <!--
-    <node name="msg" pkg="rostopic" type="rostopic" args="pub -r10 /imu_in/data sensor_msgs/Imu &quot;{header: {frame_id: 'imu_link'}, orientation: {z: 0.707, w: 0.707}}&quot;" />
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(dirname)/test_imu_transforms.rviz" if="$(arg rviz)" />
-    -->
+    <executable cmd="ros2 topic pub /imu_in sensor_msgs/Imu &quot;{header: {frame_id: 'imu_link'}, orientation: {z: 0.707, w: 0.707}}&quot;"/>
+
+    <node pkg="rviz2" exec="rviz2" args="-d $(dirname)/test_imu_transforms.rviz" />
 </launch>
