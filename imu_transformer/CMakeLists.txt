@@ -18,32 +18,22 @@ find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_sensor_msgs REQUIRED)
 
-#catkin_package(
-  #INCLUDE_DIRS include
-  #LIBRARIES imu_transformer_nodelet
-  #CATKIN_DEPENDS roscpp message_filters nodelet sensor_msgs tf2 tf2_ros geometry_msgs topic_tools
-#)
-
 include_directories(
   include
-  #${catkin_INCLUDE_DIRS}
 )
 
 add_executable(imu_transformer_node src/imu_transformer_node.cpp src/imu_transformer.cpp)
-#target_link_libraries(imu_transformer_node ${catkin_LIBRARIES})
 ament_target_dependencies(imu_transformer_node rclcpp sensor_msgs geometry_msgs tf2 tf2_ros tf2_sensor_msgs)
 
-#if(CATKIN_ENABLE_TESTING)
-  #find_package(roslaunch REQUIRED)
-  #roslaunch_add_file_check(launch)
-
+#if(BUILD_TESTING)
   #find_package(tf2_geometry_msgs REQUIRED)
-  #include_directories(${tf2_geometry_msgs_INCLUDE_DIRS})
-  #catkin_add_gtest(test_imu_transforms test/test_imu_transforms.cpp)
-  #target_link_libraries(test_imu_transforms ${catkin_LIBRARIES} ${tf2_geometry_msgs_LIBRARIES})
+  #find_package(ament_cmake_gtest REQUIRED)
+
+  #ament_add_gtest(test_imu_transforms test/test_imu_transforms.cpp)
+  #ament_target_dependencies(test_imu_transforms sensor_msgs geometry_msgs tf2 tf2_ros tf2_sensor_msgs)
 #endif()
 
-install(TARGETS 
+install(TARGETS
   imu_transformer_node
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/${PROJECT_NAME}

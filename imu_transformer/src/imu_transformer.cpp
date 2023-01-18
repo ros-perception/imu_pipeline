@@ -12,6 +12,12 @@ namespace imu_transformer
   : Node("imu_transformer", options){
 
     tf2_buffer_ = std::make_unique<tf2_ros::Buffer>(this->get_clock());
+    // Create the timer interface before call to waitForTransform,
+    // to avoid a tf2_ros::CreateTimerInterfaceException exception
+    auto timer_interface = std::make_shared<tf2_ros::CreateTimerROS>(
+      this->get_node_base_interface(),
+      this->get_node_timers_interface());
+    tf2_buffer_->setCreateTimerInterface(timer_interface);
     tf2_listener_ = std::make_unique<tf2_ros::TransformListener>(*tf2_buffer_);
 
     target_frame_ = this->declare_parameter<std::string>("target_frame", "base_link");
@@ -19,7 +25,7 @@ namespace imu_transformer
     imu_pub_ = this->create_publisher<ImuMsg>("imu_out", 10);
     mag_pub_ = this->create_publisher<MagMsg>("mag_out", 10);
 
-    imu_sub_.subscribe(this, "imu");
+    imu_sub_.subscribe(this, "imu_in");
 
     std::chrono::duration<int> buffer_timeout(1);
 
@@ -28,7 +34,7 @@ namespace imu_transformer
     // function deactivated in foxy
     //imu_filter_->registerFailureCallback&ImuTransformer::failureCb, this);
 
-    mag_sub_.subscribe(this, "mag");
+    mag_sub_.subscribe(this, "mag_in");
     mag_filter_ = std::make_shared<MagFilter>(mag_sub_, *tf2_buffer_, target_frame_, 10, this->get_node_logging_interface(), this->get_node_clock_interface(), buffer_timeout);
     mag_filter_->registerCallback(&ImuTransformer::magCallback, this);
     // function deactivated in foxy
