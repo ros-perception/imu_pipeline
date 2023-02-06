@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
   <name>imu_transformer</name>
   <version>0.3.1</version>
@@ -14,24 +14,23 @@
   <maintainer email="pbovbel@clearpathrobotics.com">Paul Bovbel</maintainer>
   <maintainer email="tbaltovski@clearpathrobotics.com">Tony Baltovski</maintainer>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>geometry_msgs</depend>
-  <depend>nodelet</depend>
   <depend>message_filters</depend>
-  <depend>roscpp</depend>
+  <depend>rclcpp</depend>
   <depend>sensor_msgs</depend>
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
   <depend>tf2_sensor_msgs</depend>
-  <depend>topic_tools</depend>
+  <!--<depend>topic_tools</depend>-->
 
   <exec_depend>tf</exec_depend>
 
-  <test_depend>roslaunch</test_depend>
+  <!--<test_depend>roslaunch</test_depend>-->
   <test_depend>tf2_geometry_msgs</test_depend>
 
   <export>
-    <nodelet plugin="${prefix}/nodelets.xml"/>
+      <build_type>ament_cmake</build_type>
   </export>
 </package>

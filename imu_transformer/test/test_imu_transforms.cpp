@@ -8,13 +8,16 @@
 
 #include "gtest/gtest.h"
 
-#include <imu_transformer/tf2_sensor_msgs.h>
-#include <sensor_msgs/Imu.h>
-#include <sensor_msgs/MagneticField.h>
+
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
-void compareCovariances(const boost::array<double, 9>& c1, const boost::array<double, 9>& c2)
+#include <Eigen/Eigen>
+#include <Eigen/Geometry>
+
+#include <imu_transformer/tf2_sensor_msgs.h>
+
+void compareCovariances(const std::array<double, 9>& c1, const std::array<double, 9>& c2)
 {
   for (size_t i = 0; i < 9; ++i)
     EXPECT_NEAR(c1[i], c2[i], 1e-6) << "Wrong value at position " << i;
@@ -22,9 +25,9 @@ void compareCovariances(const boost::array<double, 9>& c1, const boost::array<do
 
 TEST(Covariance, Transform)
 {
-  boost::array<double, 9> in = {1, 0, 0, 0, 2, 0, 0, 0, 3};
-  boost::array<double, 9> expectedOut = {1, 0, 0, 0, 2, 0, 0, 0, 3};
-  boost::array<double, 9> out{};
+  std::array<double, 9> in = {1, 0, 0, 0, 2, 0, 0, 0, 3};
+  std::array<double, 9> expectedOut = {1, 0, 0, 0, 2, 0, 0, 0, 3};
+  std::array<double, 9> out{};
   Eigen::Quaterniond q(1, 0, 0, 0);
   tf2::transformCovariance(in, out, q);
   compareCovariances(expectedOut, out);
@@ -69,22 +72,22 @@ TEST(Covariance, Transform)
 
 TEST(Imu, GetTimestamp)
 {
-  sensor_msgs::Imu msg;
+  sensor_msgs::msg::Imu msg;
   msg.header.stamp.sec = 1;
-  msg.header.stamp.nsec = 2;
+  msg.header.stamp.nanosec = 2;
   
-  EXPECT_EQ(msg.header.stamp, tf2::getTimestamp(msg));
+  EXPECT_EQ(tf2_ros::fromMsg(msg.header.stamp), tf2::getTimestamp(msg));
 }
 
 TEST(Imu, GetFrameId)
 {
-  sensor_msgs::Imu msg;
+  sensor_msgs::msg::Imu msg;
   msg.header.frame_id = "test";
   
   EXPECT_EQ(msg.header.frame_id, tf2::getFrameId(msg));
 }
 
-void prepareImuMsg(sensor_msgs::Imu& msg)
+void prepareImuMsg(sensor_msgs::msg::Imu& msg)
 {
   msg.header.frame_id = "test2";
   msg.header.stamp.sec = 1;
@@ -100,7 +103,7 @@ void prepareImuMsg(sensor_msgs::Imu& msg)
   msg.orientation_covariance = {1, 0, 0, 0, 2, 0, 0, 0, 3};
 }
 
-void prepareTf(geometry_msgs::TransformStamped& tf)
+void prepareTf(geometry_msgs::msg::TransformStamped& tf)
 {
   tf.header.frame_id = "test";
   tf.header.stamp.sec = 1;
@@ -115,17 +118,17 @@ TEST(Imu, DoTransformYaw)
 {
   // Q = +90 degrees yaw
   
-  sensor_msgs::Imu msg;
+  sensor_msgs::msg::Imu msg;
   prepareImuMsg(msg);
   
-  geometry_msgs::TransformStamped tf;
+  geometry_msgs::msg::TransformStamped tf;
   prepareTf(tf);
 
   tf2::Quaternion q;
   q.setRPY(0, 0, M_PI_2);
   tf2::convert(q, tf.transform.rotation);
   
-  sensor_msgs::Imu out;
+  sensor_msgs::msg::Imu out;
   tf2::doTransform(msg, out, tf);
   
   tf2::Quaternion rot;
@@ -154,17 +157,17 @@ TEST(Imu, DoTransformEnuNed)
 {
   // Q = ENU->NED transform
   
-  sensor_msgs::Imu msg;
+  sensor_msgs::msg::Imu msg;
   prepareImuMsg(msg);
   
-  geometry_msgs::TransformStamped tf;
+  geometry_msgs::msg::TransformStamped tf;
   prepareTf(tf);
 
   tf2::Quaternion q;
   q.setRPY(M_PI, 0, M_PI_2);
   tf2::convert(q, tf.transform.rotation);
   
-  sensor_msgs::Imu out;
+  sensor_msgs::msg::Imu out;
   tf2::doTransform(msg, out, tf);
   
   tf2::Quaternion rot;
@@ -191,22 +194,22 @@ TEST(Imu, DoTransformEnuNed)
 
 TEST(Mag, GetTimestamp)
 {
-  sensor_msgs::MagneticField msg;
+  sensor_msgs::msg::MagneticField msg;
   msg.header.stamp.sec = 1;
-  msg.header.stamp.nsec = 2;
+  msg.header.stamp.nanosec = 2;
 
-  EXPECT_EQ(msg.header.stamp, tf2::getTimestamp(msg));
+  EXPECT_EQ(tf2_ros::fromMsg(msg.header.stamp), tf2::getTimestamp(msg));
 }
 
 TEST(Mag, GetFrameId)
 {
-  sensor_msgs::MagneticField msg;
+  sensor_msgs::msg::MagneticField msg;
   msg.header.frame_id = "test";
 
   EXPECT_EQ(msg.header.frame_id, tf2::getFrameId(msg));
 }
 
-void prepareMagMsg(sensor_msgs::MagneticField& msg)
+void prepareMagMsg(sensor_msgs::msg::MagneticField& msg)
 {
   msg.header.frame_id = "test2";
   msg.header.stamp.sec = 1;
@@ -220,17 +223,17 @@ TEST(Mag, DoTransformYaw)
 {
   // Q = +90 degrees yaw
 
-  sensor_msgs::MagneticField msg;
+  sensor_msgs::msg::MagneticField msg;
   prepareMagMsg(msg);
 
-  geometry_msgs::TransformStamped tf;
+  geometry_msgs::msg::TransformStamped tf;
   prepareTf(tf);
 
   tf2::Quaternion q;
   q.setRPY(0, 0, M_PI_2);
   tf2::convert(q, tf.transform.rotation);
 
-  sensor_msgs::MagneticField out;
+  sensor_msgs::msg::MagneticField out;
   tf2::doTransform(msg, out, tf);
 
   EXPECT_EQ("test", out.header.frame_id);
@@ -246,17 +249,17 @@ TEST(Mag, DoTransformEnuNed)
 {
   // Q = ENU->NED transform
 
-  sensor_msgs::MagneticField msg;
+  sensor_msgs::msg::MagneticField msg;
   prepareMagMsg(msg);
 
-  geometry_msgs::TransformStamped tf;
+  geometry_msgs::msg::TransformStamped tf;
   prepareTf(tf);
 
   tf2::Quaternion q;
   q.setRPY(M_PI, 0, M_PI_2);
   tf2::convert(q, tf.transform.rotation);
 
-  sensor_msgs::MagneticField out;
+  sensor_msgs::msg::MagneticField out;
   tf2::doTransform(msg, out, tf);
 
   EXPECT_EQ("test", out.header.frame_id);

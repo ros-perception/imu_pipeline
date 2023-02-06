@@ -33,10 +33,8 @@
 #define TF2_SENSOR_MSGS_H
 
 #include <tf2/convert.h>
-#include <sensor_msgs/PointCloud2.h>
-#include <sensor_msgs/Imu.h>
-#include <sensor_msgs/MagneticField.h>
-#include <sensor_msgs/point_cloud2_iterator.h>
+#include <sensor_msgs/msg/imu.hpp>
+#include <sensor_msgs/msg/magnetic_field.hpp>
 #include <Eigen/Eigen>
 #include <Eigen/Geometry>
 
@@ -52,21 +50,21 @@ namespace tf2
 */
   template <>
   inline
-  const ros::Time& getTimestamp(const sensor_msgs::Imu& p) {return p.header.stamp;}
+  tf2::TimePoint getTimestamp(const sensor_msgs::msg::Imu& p) {return tf2_ros::fromMsg(p.header.stamp);}
 
 /**
 * method to extract frame id from object
 */
   template <>
   inline
-  const std::string& getFrameId(const sensor_msgs::Imu &p) {return p.header.frame_id;}
+  std::string getFrameId(const sensor_msgs::msg::Imu &p) {return p.header.frame_id;}
 
 
 /**
 * Transforms a covariance array from one frame to another
 */
   inline
-  void transformCovariance(const boost::array<double, 9>& in, boost::array<double, 9>& out, Eigen::Quaternion<double> r){
+  void transformCovariance(const std::array<double, 9>& in, std::array<double, 9>& out, Eigen::Quaternion<double> r){
 
     Eigen::Map<const Eigen::Matrix<double, 3, 3, Eigen::RowMajor> > cov_in(in.data());
     Eigen::Map<Eigen::Matrix<double, 3, 3, Eigen::RowMajor> > cov_out(out.data());
@@ -79,7 +77,7 @@ namespace tf2
 */
   template <>
   inline
-  void doTransform(const sensor_msgs::Imu &imu_in, sensor_msgs::Imu &imu_out, const geometry_msgs::TransformStamped& t_in)
+  void doTransform(const sensor_msgs::msg::Imu &imu_in, sensor_msgs::msg::Imu &imu_out, const geometry_msgs::msg::TransformStamped& t_in)
   {
 
     imu_out.header = t_in.header;
@@ -125,13 +123,13 @@ namespace tf2
   }
 
   inline
-  sensor_msgs::Imu toMsg(const sensor_msgs::Imu &in)
+  sensor_msgs::msg::Imu toMsg(const sensor_msgs::msg::Imu &in)
   {
     return in;
   }
 
   inline
-  void fromMsg(const sensor_msgs::Imu &msg, sensor_msgs::Imu &out)
+  void fromMsg(const sensor_msgs::msg::Imu &msg, sensor_msgs::msg::Imu &out)
   {
     out = msg;
   }
@@ -145,21 +143,21 @@ namespace tf2
 */
   template <>
   inline
-  const ros::Time& getTimestamp(const sensor_msgs::MagneticField& p) {return p.header.stamp;}
+  tf2::TimePoint getTimestamp(const sensor_msgs::msg::MagneticField& p) {return tf2_ros::fromMsg(p.header.stamp);}
 
 /**
 * method to extract frame id from object
 */
   template <>
   inline
-  const std::string& getFrameId(const sensor_msgs::MagneticField &p) {return p.header.frame_id;}
+  std::string getFrameId(const sensor_msgs::msg::MagneticField &p) {return p.header.frame_id;}
 
 /**
 * Transforms sensor_msgs::MagneticField data from one frame to another
 */
   template <>
   inline
-  void doTransform(const sensor_msgs::MagneticField &mag_in, sensor_msgs::MagneticField &mag_out, const geometry_msgs::TransformStamped& t_in)
+  void doTransform(const sensor_msgs::msg::MagneticField &mag_in, sensor_msgs::msg::MagneticField &mag_out, const geometry_msgs::msg::TransformStamped& t_in)
   {
 
     mag_out.header = t_in.header;
@@ -181,13 +179,13 @@ namespace tf2
   }
 
   inline
-  sensor_msgs::MagneticField toMsg(const sensor_msgs::MagneticField &in)
+  sensor_msgs::msg::MagneticField toMsg(const sensor_msgs::msg::MagneticField &in)
   {
     return in;
   }
 
   inline
-  void fromMsg(const sensor_msgs::MagneticField &msg, sensor_msgs::MagneticField &out)
+  void fromMsg(const sensor_msgs::msg::MagneticField &msg, sensor_msgs::msg::MagneticField &out)
   {
     out = msg;
   }
