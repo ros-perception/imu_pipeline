@@ -31,132 +31,155 @@
  * Author: Chad Rockey
  */
 
-#include <ros/ros.h>
 
-#include <sensor_msgs/Imu.h>
-#include <geometry_msgs/Twist.h>
-#include <nav_msgs/Odometry.h>
-#include <geometry_msgs/Vector3Stamped.h>
+#include <geometry_msgs/msg/twist.hpp>
+#include <geometry_msgs/msg/vector3_stamped.hpp>
+#include <nav_msgs/msg/odometry.hpp>
+#include <sensor_msgs/msg/imu.hpp>
+#include <rclcpp/rclcpp.hpp>
 
-ros::Publisher pub_;
-ros::Publisher bias_pub_;
-
-bool use_cmd_vel_;
-bool use_odom_;
-
-bool twist_is_zero_;
-bool odom_is_zero_;
-
-double cmd_vel_threshold_;
-double odom_threshold_;
-
-// Implement an exponentially weighted moving average to calculate bias
-double accumulator_alpha_;
-geometry_msgs::Vector3 angular_velocity_accumulator;
+namespace imu_processors
+{
 
 // Returns true if |val1| < val2
-bool abslt(const double& val1, const double& val2){
+bool abslt(const double& val1, const double& val2)
+{
   return std::abs(val1) < val2;
 }
 
-double accumulator_update(const double& alpha, const double& avg, const double& meas){
+double accumulator_update(const double& alpha, const double& avg, const double& meas)
+{
   return alpha * meas + (1.0 - alpha) * avg;
 }
 
-void cmd_vel_callback(const geometry_msgs::TwistConstPtr& msg){
-  if(use_cmd_vel_){
-    if(abslt(msg->linear.x, cmd_vel_threshold_) &&
-       abslt(msg->linear.y, cmd_vel_threshold_) &&
-       abslt(msg->linear.z, cmd_vel_threshold_) &&
-       abslt(msg->angular.x, cmd_vel_threshold_) &&
-       abslt(msg->angular.y, cmd_vel_threshold_) &&
-       abslt(msg->angular.z, cmd_vel_threshold_)){
+class ImuBiasRemover : public rclcpp::Node
+{
+public:
+  explicit ImuBiasRemover(const rclcpp::NodeOptions & options)
+  : rclcpp::Node("imu_bias_remover", options)
+  {
+    twist_is_zero_ = false;
+    odom_is_zero_ = false;
+    accumulator_.x = 0.0;
+    accumulator_.y = 0.0;
+    accumulator_.z = 0.0;
+
+    // Get parameters
+    use_cmd_vel_ = this->declare_parameter<bool>("use_cmd_vel", false);
+    use_odom_ = this->declare_parameter<bool>("use_odom", false);
+    alpha_ = this->declare_parameter<double>("accumulator_alpha", 0.01);
+
+    if (use_cmd_vel_)
+    {
+      RCLCPP_INFO(rclcpp::get_logger("imu_bias_remover"), "Using cmd_vel");
+      cmd_sub_ = this->create_subscription<geometry_msgs::msg::Twist>(
+        "cmd_vel", rclcpp::SystemDefaultsQoS(),
+        std::bind(&ImuBiasRemover::cmd_vel_callback, this, std::placeholders::_1));
+    }
+    if (use_odom_)
+    {
+      RCLCPP_INFO(rclcpp::get_logger("imu_bias_remover"), "Using odom");
+      odom_sub_ = this->create_subscription<nav_msgs::msg::Odometry>(
+        "odom", rclcpp::SystemDefaultsQoS(),
+        std::bind(&ImuBiasRemover::odom_callback, this, std::placeholders::_1));
+    }
+
+    cmd_vel_threshold_ = this->declare_parameter<double>("cmd_vel_threshold", 0.001);
+    odom_threshold_ = this->declare_parameter<double>("odom_threshold", 0.001);
+
+    // Create publisher
+    pub_ = this->create_publisher<sensor_msgs::msg::Imu>("imu_biased", 10);
+    bias_pub_ = this->create_publisher<geometry_msgs::msg::Vector3Stamped>("bias", 10);
+
+    // Imu Subscriber
+    imu_sub_ = this->create_subscription<sensor_msgs::msg::Imu>(
+      "imu", rclcpp::SystemDefaultsQoS(),
+      std::bind(&ImuBiasRemover::imu_callback, this, std::placeholders::_1));
+  }
+
+private:
+  void cmd_vel_callback(const geometry_msgs::msg::Twist::ConstSharedPtr & msg)
+  {
+    if (abslt(msg->linear.x, cmd_vel_threshold_) &&
+        abslt(msg->linear.y, cmd_vel_threshold_) &&
+        abslt(msg->linear.z, cmd_vel_threshold_) &&
+        abslt(msg->angular.x, cmd_vel_threshold_) &&
+        abslt(msg->angular.y, cmd_vel_threshold_) &&
+        abslt(msg->angular.z, cmd_vel_threshold_))
+    {
       twist_is_zero_ = true;
       return;
     }
+    twist_is_zero_ = false;
   }
-  twist_is_zero_ = false;
-}
 
-void odom_callback(const nav_msgs::OdometryConstPtr& msg){
-  if(use_odom_){
-    if(abslt(msg->twist.twist.linear.x, odom_threshold_) &&
-       abslt(msg->twist.twist.linear.y, odom_threshold_) &&
-       abslt(msg->twist.twist.linear.z, odom_threshold_) &&
-       abslt(msg->twist.twist.angular.x, odom_threshold_) &&
-       abslt(msg->twist.twist.angular.y, odom_threshold_) &&
-       abslt(msg->twist.twist.angular.z, odom_threshold_)){
+  void odom_callback(const nav_msgs::msg::Odometry::ConstSharedPtr & msg)
+  {
+    if (abslt(msg->twist.twist.linear.x, odom_threshold_) &&
+        abslt(msg->twist.twist.linear.y, odom_threshold_) &&
+        abslt(msg->twist.twist.linear.z, odom_threshold_) &&
+        abslt(msg->twist.twist.angular.x, odom_threshold_) &&
+        abslt(msg->twist.twist.angular.y, odom_threshold_) &&
+        abslt(msg->twist.twist.angular.z, odom_threshold_))
+    {
       odom_is_zero_ = true;
       return;
     }
-  }
-  odom_is_zero_ = false;
-}
-
-void imu_callback(const sensor_msgs::ImuConstPtr& msg){
-  sensor_msgs::ImuPtr imu(new sensor_msgs::Imu(*msg));
-
-  if(twist_is_zero_ || odom_is_zero_){ // Update bias, set outputs to 0
-    angular_velocity_accumulator.x = accumulator_update(accumulator_alpha_, angular_velocity_accumulator.x, msg->angular_velocity.x);
-    angular_velocity_accumulator.y = accumulator_update(accumulator_alpha_, angular_velocity_accumulator.y, msg->angular_velocity.y);
-    angular_velocity_accumulator.z = accumulator_update(accumulator_alpha_, angular_velocity_accumulator.z, msg->angular_velocity.z);
-    imu->angular_velocity.x = 0.0;
-    imu->angular_velocity.y = 0.0;
-    imu->angular_velocity.z = 0.0;
-  } else { // Modify outputs by bias
-    imu->angular_velocity.x -= angular_velocity_accumulator.x;
-    imu->angular_velocity.y -= angular_velocity_accumulator.y;
-    imu->angular_velocity.z -= angular_velocity_accumulator.z;
+    odom_is_zero_ = false;
   }
 
-  // Publish transformed message
-	pub_.publish(imu);
+  void imu_callback(const sensor_msgs::msg::Imu::ConstSharedPtr & msg)
+  {
+    sensor_msgs::msg::Imu imu(*msg);
 
-  // Publish bias information
-  geometry_msgs::Vector3StampedPtr bias(new geometry_msgs::Vector3Stamped());
-  bias->header = imu->header;
-  bias->vector = angular_velocity_accumulator;
-  bias_pub_.publish(bias);
-}
+    if (twist_is_zero_ || odom_is_zero_)
+    {
+      // Update bias, set outputs to 0
+      accumulator_.x = accumulator_update(alpha_, accumulator_.x, msg->angular_velocity.x);
+      accumulator_.y = accumulator_update(alpha_, accumulator_.y, msg->angular_velocity.y);
+      accumulator_.z = accumulator_update(alpha_, accumulator_.z, msg->angular_velocity.z);
+      imu.angular_velocity.x = 0.0;
+      imu.angular_velocity.y = 0.0;
+      imu.angular_velocity.z = 0.0;
+    } else {
+      // Modify outputs by bias
+      imu.angular_velocity.x -= accumulator_.x;
+      imu.angular_velocity.y -= accumulator_.y;
+      imu.angular_velocity.z -= accumulator_.z;
+    }
 
+    // Publish transformed message
+    pub_->publish(imu);
 
-int main(int argc, char **argv){
-  ros::init(argc, argv, "imu_bias_remover");
-  ros::NodeHandle n;
-  ros::NodeHandle pnh("~");
-
-  // Initialize
-  twist_is_zero_ = false;
-  odom_is_zero_ = false;
-  angular_velocity_accumulator.x = 0.0;
-  angular_velocity_accumulator.y = 0.0;
-  angular_velocity_accumulator.z = 0.0;
-
-  // Get parameters
-  pnh.param<bool>("use_cmd_vel", use_cmd_vel_, false);
-  pnh.param<bool>("use_odom", use_odom_, false);
-  pnh.param<double>("accumulator_alpha", accumulator_alpha_, 0.01);
-  
-  ros::Subscriber cmd_sub;
-  if(use_cmd_vel_){
-    cmd_sub = n.subscribe("cmd_vel", 10, cmd_vel_callback);
-  }
-  ros::Subscriber odom_sub;
-  if(use_odom_){
-    odom_sub = n.subscribe("odom", 10, odom_callback);
+    // Publish bias information
+    geometry_msgs::msg::Vector3Stamped bias;
+    bias.header = imu.header;
+    bias.vector = accumulator_;
+    bias_pub_->publish(bias);
   }
 
-  pnh.param<double>("cmd_vel_threshold", cmd_vel_threshold_, 0.001);
-  pnh.param<double>("odom_threshold", odom_threshold_, 0.001);
-  
-  // Create publisher
-  pub_ = n.advertise<sensor_msgs::Imu>("imu_biased", 10);
-  bias_pub_ = n.advertise<geometry_msgs::Vector3Stamped>("bias", 10);
+private:
+  bool twist_is_zero_;
+  bool odom_is_zero_;
 
-  // Imu Subscriber
-  ros::Subscriber sub = n.subscribe("imu", 100, imu_callback);  
-  
-  ros::spin();
+  bool use_cmd_vel_;
+  bool use_odom_;
 
-  return 0;
-}
+  double cmd_vel_threshold_;
+  double odom_threshold_;
+
+  // Implement an exponentially weighted moving average to calculate bias
+  geometry_msgs::msg::Vector3 accumulator_;
+  double alpha_;
+
+  rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr pub_;
+  rclcpp::Publisher<geometry_msgs::msg::Vector3Stamped>::SharedPtr bias_pub_;
+  rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_sub_;
+  rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
+  rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr imu_sub_;
+};
+
+}  // namespace imu_processors
+
+#include <rclcpp_components/register_node_macro.hpp>
+RCLCPP_COMPONENTS_REGISTER_NODE(imu_processors::ImuBiasRemover)

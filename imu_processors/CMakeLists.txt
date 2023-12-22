@@ -1,26 +1,67 @@
-# http://ros.org/doc/groovy/api/catkin/html/user_guide/supposed.html
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.5)
 project(imu_processors)
 
-# Load catkin and all dependencies required for this package
-find_package(catkin REQUIRED roscpp sensor_msgs geometry_msgs nav_msgs tf)
+# Default to C++14
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
 
-catkin_package(
-  INCLUDE_DIRS
-  LIBRARIES
-  CATKIN_DEPENDS roscpp sensor_msgs geometry_msgs nav_msgs tf
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+find_package(ament_cmake REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclcpp_components REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
+
+add_library(imu_integrator SHARED
+  src/imu_integrator.cpp
+)
+ament_target_dependencies(imu_integrator
+  rclcpp
+  rclcpp_components
+  sensor_msgs
+)
+rclcpp_components_register_node(imu_integrator
+  PLUGIN "imu_processors::ImuIntegrator"
+  EXECUTABLE imu_integrator_node
 )
 
-include_directories(${catkin_INCLUDE_DIRS})
-
-add_executable(imu_integrator src/imu_integrator.cpp)
-target_link_libraries(imu_integrator ${catkin_LIBRARIES})
-
-add_executable(imu_bias_remover src/imu_bias_remover.cpp)
-target_link_libraries(imu_bias_remover ${catkin_LIBRARIES})
-
-# Install targets
-install(TARGETS imu_integrator imu_bias_remover
-	RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-	LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+add_library(imu_bias_remover SHARED
+  src/imu_bias_remover.cpp
 )
+ament_target_dependencies(imu_bias_remover
+  geometry_msgs
+  nav_msgs
+  rclcpp
+  rclcpp_components
+  sensor_msgs
+)
+rclcpp_components_register_node(imu_bias_remover
+  PLUGIN "imu_processors::ImuBiasRemover"
+  EXECUTABLE imu_bias_remover_node
+)
+
+if (BUILD_TESTING)
+  find_package(ament_cmake_cpplint)
+  ament_cpplint()
+endif()
+
+install(
+  TARGETS
+    imu_bias_remover
+    imu_integrator
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION lib/${PROJECT_NAME}
+)
+
+ament_export_libraries(
+  imu_bias_remover
+  imu_integrator
+)
+ament_package()
