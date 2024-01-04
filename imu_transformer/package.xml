@@ -13,6 +13,7 @@
   <author email="pbovbel@clearpathrobotics.com">Paul Bovbel</author>
   <maintainer email="pbovbel@clearpathrobotics.com">Paul Bovbel</maintainer>
   <maintainer email="tbaltovski@clearpathrobotics.com">Tony Baltovski</maintainer>
+  <maintainer email="mfergs7@gmail.com">Michael Ferguson</maintainer>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
