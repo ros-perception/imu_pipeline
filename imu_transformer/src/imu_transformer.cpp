@@ -84,4 +84,5 @@ namespace imu_transformer
 
 }
 
-//PLUGINLIB_EXPORT_CLASS(imu_transformer::ImuTransformerNodelet, nodelet::Nodelet)
+#include <rclcpp_components/register_node_macro.hpp>
+RCLCPP_COMPONENTS_REGISTER_NODE(imu_transformer::ImuTransformer)
