@@ -2,8 +2,8 @@
 Changelog for package imu_pipeline
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.0 (2024-01-03)
+------------------
 * Initial ROS 2 release
 * Contributors: Michael Ferguson, Paul Auerbach, Tony Baltovski
 
