@@ -1,3 +1,4 @@
+<?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
   <name>imu_processors</name>
   <version>0.3.1</version>
@@ -13,11 +14,19 @@
   <maintainer email="pbovbel@clearpathrobotics.com">Paul Bovbel</maintainer>
   <maintainer email="tbaltovski@clearpathrobotics.com">Tony Baltovski</maintainer>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>roscpp</depend>
-  <depend>sensor_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>nav_msgs</depend>
+  <depend>rclcpp</depend>
+  <depend>rclcpp_components</depend>
+  <depend>sensor_msgs</depend>
   <depend>tf</depend>
+
+  <test_depend>ament_cmake_cpplint</test_depend>
+
+  <export>
+      <build_type>ament_cmake</build_type>
+  </export>
+
 </package>

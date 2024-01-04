@@ -31,63 +31,76 @@
  * Author: Chad Rockey
  */
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/imu.hpp>
 
-#include <sensor_msgs/Imu.h>
+namespace imu_processors
+{
 
-ros::Publisher pub_;
-sensor_msgs::ImuPtr imu_;
-double min_angular_velocity_;
-double static_dt_;
+class ImuIntegrator : public rclcpp::Node
+{
+public:
+  explicit ImuIntegrator(const rclcpp::NodeOptions & options)
+  : rclcpp::Node("imu_integrator", options)
+  {
+    // Get parameters
+    min_angular_velocity_ = this->declare_parameter<double>("min_angular_velocity", 0.0);
+    static_dt_ = this->declare_parameter<double>("static_dt", 0.0);
+    imu_.orientation.w = 1.0;
 
-void imu_callback(const sensor_msgs::ImuConstPtr& msg){
-  double dt = msg->header.stamp.toSec() - imu_->header.stamp.toSec();
-  if(imu_->header.stamp.sec == 0){
-    dt = 0.0;
+    // Create publisher
+    pub_ = this->create_publisher<sensor_msgs::msg::Imu>("imu_integrated", 10);
+
+    // Subscriber
+    sub_ = this->create_subscription<sensor_msgs::msg::Imu>(
+      "imu", rclcpp::SystemDefaultsQoS(),
+      std::bind(&ImuIntegrator::callback, this, std::placeholders::_1));
   }
-  if(static_dt_ > 0.0001){
-    dt = static_dt_;
+
+private:
+  void callback(const sensor_msgs::msg::Imu::ConstSharedPtr & msg)
+  {
+    rclcpp::Time msg_time(msg->header.stamp);
+    rclcpp::Time imu_time(imu_.header.stamp);
+    double dt = msg_time.seconds() - imu_time.seconds();
+    if (imu_time.seconds() == 0)
+    {
+      dt = 0.0;
+    }
+    if (static_dt_ > 0.0001)
+    {
+      dt = static_dt_;
+    }
+    imu_.header = msg->header;
+    imu_.angular_velocity = msg->angular_velocity;
+    imu_.angular_velocity_covariance = msg->angular_velocity_covariance;
+    imu_.linear_acceleration = msg->linear_acceleration;
+    imu_.linear_acceleration_covariance = msg->linear_acceleration_covariance;
+
+    double diff = pow(imu_.orientation.w, 2.0) - pow(imu_.orientation.z, 2.0);
+    double mult = 2.0 * imu_.orientation.w * imu_.orientation.z;
+    double theta = atan2(mult, diff);
+    if (std::abs(imu_.angular_velocity.z) > min_angular_velocity_)
+    {
+      theta = theta + imu_.angular_velocity.z * dt;
+    }
+
+    // Fill in quaternion
+    imu_.orientation.z = sin(theta / 2.0);
+    imu_.orientation.w = cos(theta / 2.0);
+
+    // Publish transformed message
+    pub_->publish(imu_);
   }
-	imu_->header = msg->header;
-  imu_->angular_velocity = msg->angular_velocity;
-  imu_->angular_velocity_covariance = msg->angular_velocity_covariance;
-  imu_->linear_acceleration = msg->linear_acceleration;
-  imu_->linear_acceleration_covariance = msg->linear_acceleration_covariance;
 
-  double diff = pow(imu_->orientation.w, 2.0)-pow(imu_->orientation.z, 2.0);
-  double mult = 2.0*imu_->orientation.w*imu_->orientation.z;
-  double theta = atan2(mult, diff);
-  if(std::abs(imu_->angular_velocity.z) > min_angular_velocity_){
-    theta = theta + imu_->angular_velocity.z*dt;
-  }
-  
-  // Fill in quaternion
-  imu_->orientation.z = sin(theta/2.0);
-  imu_->orientation.w = cos(theta/2.0);
+  rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr pub_;
+  rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr sub_;
+  sensor_msgs::msg::Imu imu_;
+  double min_angular_velocity_;
+  double static_dt_;
+};
 
-  // Publish transformed message
-	pub_.publish(imu_);
-}
+}  // namespace imu_processors
 
-
-int main(int argc, char **argv){
-  ros::init(argc, argv, "imu_integrator");
-  ros::NodeHandle n;
-  ros::NodeHandle pnh("~");
-
-  // Get parameters
-  pnh.param<double>("min_angular_velocity", min_angular_velocity_, 0.0);
-  pnh.param<double>("static_dt", static_dt_, 0.0);
-  imu_.reset(new sensor_msgs::Imu());
-  imu_->orientation.w = 1.0;
-  
-  // Create publisher
-  pub_ = n.advertise<sensor_msgs::Imu>("imu_integrated", 10);
-
-  // Subscriber
-  ros::Subscriber sub = n.subscribe("imu", 100, imu_callback);  
-  
-  ros::spin();
-
-  return 0;
-}
+#include <rclcpp_components/register_node_macro.hpp>
+RCLCPP_COMPONENTS_REGISTER_NODE(imu_processors::ImuIntegrator)
