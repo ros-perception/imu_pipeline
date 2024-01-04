@@ -2,6 +2,11 @@
 Changelog for package imu_processors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Initial ROS 2 release
+* Contributors: Michael Ferguson, Paul Auerbach, Tony Baltovski
+
 0.3.1 (2022-11-22)
 ------------------
 

@@ -2,6 +2,11 @@
 Changelog for package imu_transformer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Initial ROS 2 release
+* Contributors: Michael Ferguson, Paul Auerbach, Tony Baltovski
+
 0.3.1 (2022-11-22)
 ------------------
 * imu_transformer: Fix transformation of the orientation of IMU.
