@@ -2,8 +2,8 @@
 Changelog for package imu_processors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.1 (2024-01-05)
+------------------
 * update dependency tf->tf2_ros (`#22 <https://github.com/ros-perception/imu_pipeline/issues/22>`_)
   found this when trying to do first release...
 * Contributors: Michael Ferguson
