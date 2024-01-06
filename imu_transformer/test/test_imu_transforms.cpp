@@ -10,7 +10,7 @@
 
 
 #include <tf2/LinearMath/Quaternion.h>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 
 #include <Eigen/Eigen>
 #include <Eigen/Geometry>
@@ -31,7 +31,7 @@ TEST(Covariance, Transform)
   Eigen::Quaterniond q(1, 0, 0, 0);
   tf2::transformCovariance(in, out, q);
   compareCovariances(expectedOut, out);
-  
+
   q = Eigen::Quaterniond(Eigen::AngleAxisd(M_PI_2, Eigen::Vector3d(0, 0, 1)));
   expectedOut = {2, 0, 0, 0, 1, 0, 0, 0, 3};
   tf2::transformCovariance(in, out, q);
@@ -40,7 +40,7 @@ TEST(Covariance, Transform)
   q = q.inverse();
   tf2::transformCovariance(in, out, q);
   compareCovariances(expectedOut, out);
-  
+
   q = Eigen::Quaterniond(Eigen::AngleAxisd(M_PI_2, Eigen::Vector3d(1, 0, 0)));
   expectedOut = {1, 0, 0, 0, 3, 0, 0, 0, 2};
   tf2::transformCovariance(in, out, q);
@@ -49,21 +49,21 @@ TEST(Covariance, Transform)
   q = q.inverse();
   tf2::transformCovariance(in, out, q);
   compareCovariances(expectedOut, out);
-  
+
   q = Eigen::Quaterniond(Eigen::AngleAxisd(M_PI_2, Eigen::Vector3d(0, 1, 0)));
   expectedOut = {3, 0, 0, 0, 2, 0, 0, 0, 1};
   tf2::transformCovariance(in, out, q);
   compareCovariances(expectedOut, out);
-  
+
   q = q.inverse();
   tf2::transformCovariance(in, out, q);
   compareCovariances(expectedOut, out);
-  
+
   q = Eigen::Quaterniond(Eigen::AngleAxisd(M_PI_2, Eigen::Vector3d(1, 1, 1)));
   expectedOut = {2.5, -0.5, 3, 1, 0, -1, -1.5, 2, 0.5};
   tf2::transformCovariance(in, out, q);
   compareCovariances(expectedOut, out);
-  
+
   q = q.inverse();
   expectedOut = {1.5, -1, 1, 2, 2, -1.5, -0.5, 3, -0.5};
   tf2::transformCovariance(in, out, q);
@@ -75,7 +75,7 @@ TEST(Imu, GetTimestamp)
   sensor_msgs::msg::Imu msg;
   msg.header.stamp.sec = 1;
   msg.header.stamp.nanosec = 2;
-  
+
   EXPECT_EQ(tf2_ros::fromMsg(msg.header.stamp), tf2::getTimestamp(msg));
 }
 
@@ -83,7 +83,7 @@ TEST(Imu, GetFrameId)
 {
   sensor_msgs::msg::Imu msg;
   msg.header.frame_id = "test";
-  
+
   EXPECT_EQ(msg.header.frame_id, tf2::getFrameId(msg));
 }
 
@@ -117,22 +117,22 @@ void prepareTf(geometry_msgs::msg::TransformStamped& tf)
 TEST(Imu, DoTransformYaw)
 {
   // Q = +90 degrees yaw
-  
+
   sensor_msgs::msg::Imu msg;
   prepareImuMsg(msg);
-  
+
   geometry_msgs::msg::TransformStamped tf;
   prepareTf(tf);
 
   tf2::Quaternion q;
   q.setRPY(0, 0, M_PI_2);
   tf2::convert(q, tf.transform.rotation);
-  
+
   sensor_msgs::msg::Imu out;
   tf2::doTransform(msg, out, tf);
-  
+
   tf2::Quaternion rot;
-  
+
   EXPECT_EQ("test", out.header.frame_id);
   EXPECT_EQ(msg.header.stamp, out.header.stamp);
   EXPECT_NEAR(-msg.angular_velocity.y, out.angular_velocity.x, 1e-6);
@@ -149,29 +149,29 @@ TEST(Imu, DoTransformYaw)
 
   compareCovariances({2, 0, 0, 0, 1, 0, 0, 0, 3}, out.angular_velocity_covariance);
   compareCovariances({2, 0, 0, 0, 1, 0, 0, 0, 3}, out.linear_acceleration_covariance);
-  // Orientation covariance stays as it is measured regarding the fixed world frame 
+  // Orientation covariance stays as it is measured regarding the fixed world frame
   compareCovariances(msg.orientation_covariance, out.orientation_covariance);
 }
 
 TEST(Imu, DoTransformEnuNed)
 {
   // Q = ENU->NED transform
-  
+
   sensor_msgs::msg::Imu msg;
   prepareImuMsg(msg);
-  
+
   geometry_msgs::msg::TransformStamped tf;
   prepareTf(tf);
 
   tf2::Quaternion q;
   q.setRPY(M_PI, 0, M_PI_2);
   tf2::convert(q, tf.transform.rotation);
-  
+
   sensor_msgs::msg::Imu out;
   tf2::doTransform(msg, out, tf);
-  
+
   tf2::Quaternion rot;
-  
+
   EXPECT_EQ("test", out.header.frame_id);
   EXPECT_EQ(msg.header.stamp, out.header.stamp);
   EXPECT_NEAR(msg.angular_velocity.y, out.angular_velocity.x, 1e-6);
@@ -188,7 +188,7 @@ TEST(Imu, DoTransformEnuNed)
 
   compareCovariances({2, 0, 0, 0, 1, 0, 0, 0, 3}, out.angular_velocity_covariance);
   compareCovariances({2, 0, 0, 0, 1, 0, 0, 0, 3}, out.linear_acceleration_covariance);
-  // Orientation covariance stays as it is measured regarding the fixed world frame 
+  // Orientation covariance stays as it is measured regarding the fixed world frame
   compareCovariances(msg.orientation_covariance, out.orientation_covariance);
 }
 
