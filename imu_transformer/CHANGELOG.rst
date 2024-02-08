@@ -2,8 +2,8 @@
 Changelog for package imu_transformer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.0 (2024-02-08)
+------------------
 * update header to remove deprecation warning (`#23 <https://github.com/ros-perception/imu_pipeline/issues/23>`_)
 * Contributors: Michael Ferguson
 
