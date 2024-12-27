@@ -2,6 +2,15 @@
 Changelog for package imu_transformer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.1 (2024-12-27)
+------------------
+* Deprecate c headers (`#25 <https://github.com/ros-perception/imu_pipeline/issues/25>`_)
+  Related to this [pull
+  request](https://github.com/ros2/geometry2/pull/720) in `geometry2` in
+  which we deprecated the `.h` style headers in favor of `.hpp`.
+  ---------
+* Contributors: Lucas Wendland
+
 0.5.0 (2024-02-08)
 ------------------
 * update header to remove deprecation warning (`#23 <https://github.com/ros-perception/imu_pipeline/issues/23>`_)
