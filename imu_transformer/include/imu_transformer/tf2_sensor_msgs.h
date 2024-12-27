@@ -32,7 +32,7 @@
 #ifndef TF2_SENSOR_MSGS_H
 #define TF2_SENSOR_MSGS_H
 
-#include <tf2/convert.h>
+#include <tf2/convert.hpp>
 #include <sensor_msgs/msg/imu.hpp>
 #include <sensor_msgs/msg/magnetic_field.hpp>
 #include <Eigen/Eigen>
