@@ -26,7 +26,7 @@ include_directories(
 add_library(imu_transformer SHARED
   src/imu_transformer.cpp
 )
-ament_target_dependencies(imu_transformer
+target_link_libraries(imu_transformer PUBLIC
   message_filters
   rclcpp
   rclcpp_components

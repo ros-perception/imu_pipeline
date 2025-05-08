@@ -21,7 +21,7 @@ find_package(tf2_ros REQUIRED)
 add_library(imu_integrator SHARED
   src/imu_integrator.cpp
 )
-ament_target_dependencies(imu_integrator
+target_link_libraries(imu_integrator PUBLIC
   rclcpp
   rclcpp_components
   sensor_msgs
@@ -34,7 +34,7 @@ rclcpp_components_register_node(imu_integrator
 add_library(imu_bias_remover SHARED
   src/imu_bias_remover.cpp
 )
-ament_target_dependencies(imu_bias_remover
+target_link_libraries(imu_bias_remover PUBLIC
   geometry_msgs
   nav_msgs
   rclcpp
