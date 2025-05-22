@@ -1,5 +1,11 @@
 IMU Pipeline metapackage includes tools for processing and pre-processing IMU messages for easier use by later subscribers.
 
+Branches
+========
+
+ * ``ros2`` - main branch, for ROS 2 Kilted and later
+ * ``jazzy`` - supports ROS 2 Humble to Jazzy
+
 imu_transformer
 ===============
 
