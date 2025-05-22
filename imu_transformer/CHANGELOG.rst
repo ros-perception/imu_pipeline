@@ -2,8 +2,8 @@
 Changelog for package imu_transformer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.0 (2025-05-22)
+------------------
 * handle deprecations on rolling (`#27 <https://github.com/ros-perception/imu_pipeline/issues/27>`_)
 * [kilted] Update deprecated call to ament_target_dependencies (`#26 <https://github.com/ros-perception/imu_pipeline/issues/26>`_)
   As of the ROS 2 Kilted release [`ament_target_dependencies` is

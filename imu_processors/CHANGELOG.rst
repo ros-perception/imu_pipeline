@@ -2,8 +2,8 @@
 Changelog for package imu_processors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.0 (2025-05-22)
+------------------
 * [kilted] Update deprecated call to ament_target_dependencies (`#26 <https://github.com/ros-perception/imu_pipeline/issues/26>`_)
   As of the ROS 2 Kilted release [`ament_target_dependencies` is
   deprecated.](https://docs.ros.org/en/kilted/Releases/Release-Kilted-Kaiju.html#ament-target-dependencies-is-deprecated)
