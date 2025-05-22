@@ -24,7 +24,7 @@ namespace imu_transformer
     imu_pub_ = this->create_publisher<ImuMsg>("imu_out", 10);
     mag_pub_ = this->create_publisher<MagMsg>("mag_out", 10);
 
-    imu_sub_.subscribe(this, "imu_in");
+    imu_sub_.subscribe(this, "imu_in", 10);
 
     std::chrono::duration<int> buffer_timeout(1);
 
@@ -33,7 +33,7 @@ namespace imu_transformer
     // function deactivated in foxy
     //imu_filter_->registerFailureCallback&ImuTransformer::failureCb, this);
 
-    mag_sub_.subscribe(this, "mag_in");
+    mag_sub_.subscribe(this, "mag_in", 10);
     mag_filter_ = std::make_shared<MagFilter>(mag_sub_, *tf2_buffer_, target_frame_, 10, this->get_node_logging_interface(), this->get_node_clock_interface(), buffer_timeout);
     mag_filter_->registerCallback(&ImuTransformer::magCallback, this);
     // function deactivated in foxy
