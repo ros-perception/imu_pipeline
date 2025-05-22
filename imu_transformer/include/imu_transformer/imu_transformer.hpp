@@ -8,7 +8,7 @@
 #include "tf2_ros/message_filter.h"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/magnetic_field.hpp"
-#include "message_filters/subscriber.h"
+#include "message_filters/subscriber.hpp"
 
 #include <string>
 
