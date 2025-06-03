@@ -33,6 +33,7 @@
 
 
 #include <geometry_msgs/msg/twist.hpp>
+#include <geometry_msgs/msg/twist_stamped.hpp>
 #include <geometry_msgs/msg/vector3_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <sensor_msgs/msg/imu.hpp>
@@ -68,13 +69,21 @@ public:
     use_cmd_vel_ = this->declare_parameter<bool>("use_cmd_vel", false);
     use_odom_ = this->declare_parameter<bool>("use_odom", false);
     alpha_ = this->declare_parameter<double>("accumulator_alpha", 0.01);
+    use_stamped_ = this->declare_parameter<bool>("use_stamped", false);
 
     if (use_cmd_vel_)
     {
       RCLCPP_INFO(rclcpp::get_logger("imu_bias_remover"), "Using cmd_vel");
-      cmd_sub_ = this->create_subscription<geometry_msgs::msg::Twist>(
-        "cmd_vel", rclcpp::SystemDefaultsQoS(),
-        std::bind(&ImuBiasRemover::cmd_vel_callback, this, std::placeholders::_1));
+      if (use_stamped_)
+      {
+        cmd_stamped_sub_ = this->create_subscription<geometry_msgs::msg::TwistStamped>(
+          "cmd_vel", rclcpp::SystemDefaultsQoS(),
+          std::bind(&ImuBiasRemover::cmd_vel_stamped_callback, this, std::placeholders::_1));
+      } else {
+        cmd_sub_ = this->create_subscription<geometry_msgs::msg::Twist>(
+          "cmd_vel", rclcpp::SystemDefaultsQoS(),
+          std::bind(&ImuBiasRemover::cmd_vel_callback, this, std::placeholders::_1));
+      }
     }
     if (use_odom_)
     {
@@ -107,6 +116,18 @@ private:
         abslt(msg->angular.y, cmd_vel_threshold_) &&
         abslt(msg->angular.z, cmd_vel_threshold_))
     {
+      twist_is_zero_ = true;
+      return;
+    }
+    twist_is_zero_ = false;
+  }
+
+  void cmd_vel_stamped_callback(const geometry_msgs::msg::TwistStamped::ConstSharedPtr & msg)
+  {
+    if (
+      abslt(msg->twist.linear.x, cmd_vel_threshold_) && abslt(msg->twist.linear.y, cmd_vel_threshold_) &&
+      abslt(msg->twist.linear.z, cmd_vel_threshold_) && abslt(msg->twist.angular.x, cmd_vel_threshold_) &&
+      abslt(msg->twist.angular.y, cmd_vel_threshold_) && abslt(msg->twist.angular.z, cmd_vel_threshold_)) {
       twist_is_zero_ = true;
       return;
     }
@@ -164,6 +185,7 @@ private:
 
   bool use_cmd_vel_;
   bool use_odom_;
+  bool use_stamped_;
 
   double cmd_vel_threshold_;
   double odom_threshold_;
@@ -175,6 +197,7 @@ private:
   rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr pub_;
   rclcpp::Publisher<geometry_msgs::msg::Vector3Stamped>::SharedPtr bias_pub_;
   rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_sub_;
+  rclcpp::Subscription<geometry_msgs::msg::TwistStamped>::SharedPtr cmd_stamped_sub_;
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
   rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr imu_sub_;
 };
