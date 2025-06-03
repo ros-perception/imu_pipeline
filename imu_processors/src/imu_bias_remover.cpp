@@ -69,7 +69,7 @@ public:
     use_cmd_vel_ = this->declare_parameter<bool>("use_cmd_vel", false);
     use_odom_ = this->declare_parameter<bool>("use_odom", false);
     alpha_ = this->declare_parameter<double>("accumulator_alpha", 0.01);
-    use_stamped_ = this->declare_parameter<bool>("use_stamped", false);
+    use_stamped_ = this->declare_parameter<bool>("use_stamped", true);
 
     if (use_cmd_vel_)
     {
