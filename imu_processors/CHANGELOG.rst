@@ -2,6 +2,13 @@
 Changelog for package imu_processors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* set use_stamped to default true for kilted and later (`#32 <https://github.com/ros-perception/imu_pipeline/issues/32>`_)
+* Add use_stamped parameter to bias remover (`#30 <https://github.com/ros-perception/imu_pipeline/issues/30>`_)
+  Adds `use_stamped` parameter (default is `false`) to bias remover node
+* Contributors: Michael Ferguson, Tatsuro Sakaguchi
+
 0.6.0 (2025-05-22)
 ------------------
 * [kilted] Update deprecated call to ament_target_dependencies (`#26 <https://github.com/ros-perception/imu_pipeline/issues/26>`_)
