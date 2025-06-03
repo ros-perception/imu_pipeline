@@ -2,6 +2,9 @@
 Changelog for package imu_transformer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.5.1 (2024-12-27)
 ------------------
 * Deprecate c headers (`#25 <https://github.com/ros-perception/imu_pipeline/issues/25>`_)
