@@ -2,8 +2,8 @@
 Changelog for package imu_processors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.1 (2025-06-02)
+------------------
 * set use_stamped to default true for kilted and later (`#32 <https://github.com/ros-perception/imu_pipeline/issues/32>`_)
 * Add use_stamped parameter to bias remover (`#30 <https://github.com/ros-perception/imu_pipeline/issues/30>`_)
   Adds `use_stamped` parameter (default is `false`) to bias remover node

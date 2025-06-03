@@ -2,8 +2,8 @@
 Changelog for package imu_transformer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.1 (2025-06-02)
+------------------
 * add depend on ament_cmake_gtest (`#28 <https://github.com/ros-perception/imu_pipeline/issues/28>`_)
   Debian is building, but test job is still failing
 * Contributors: Michael Ferguson
