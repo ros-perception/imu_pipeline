@@ -27,7 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* 
+/*
  * Author: Chad Rockey
  */
 
@@ -124,10 +124,13 @@ private:
 
   void cmd_vel_stamped_callback(const geometry_msgs::msg::TwistStamped::ConstSharedPtr & msg)
   {
-    if (
-      abslt(msg->twist.linear.x, cmd_vel_threshold_) && abslt(msg->twist.linear.y, cmd_vel_threshold_) &&
-      abslt(msg->twist.linear.z, cmd_vel_threshold_) && abslt(msg->twist.angular.x, cmd_vel_threshold_) &&
-      abslt(msg->twist.angular.y, cmd_vel_threshold_) && abslt(msg->twist.angular.z, cmd_vel_threshold_)) {
+    if (abslt(msg->twist.linear.x, cmd_vel_threshold_) &&
+        abslt(msg->twist.linear.y, cmd_vel_threshold_) &&
+        abslt(msg->twist.linear.z, cmd_vel_threshold_) &&
+        abslt(msg->twist.angular.x, cmd_vel_threshold_) &&
+        abslt(msg->twist.angular.y, cmd_vel_threshold_) &&
+        abslt(msg->twist.angular.z, cmd_vel_threshold_))
+    {
       twist_is_zero_ = true;
       return;
     }
