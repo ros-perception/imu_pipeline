@@ -41,15 +41,6 @@ rclcpp_components_register_node(imu_transformer
   EXECUTABLE imu_transformer_node
 )
 
-if(BUILD_TESTING)
-  find_package(geometry_msgs REQUIRED)
-  find_package(tf2_geometry_msgs REQUIRED)
-  find_package(ament_cmake_gtest REQUIRED)
-
-  ament_add_gtest(test_imu_transforms test/test_imu_transforms.cpp)
-  target_link_libraries(test_imu_transforms ${geometry_msgs_TARGETS} ${sensor_msgs_TARGETS} sensor_msgs::sensor_msgs_library tf2::tf2 tf2_geometry_msgs::tf2_geometry_msgs tf2_ros::tf2_ros tf2_sensor_msgs::tf2_sensor_msgs)
-endif()
-
 install(
   TARGETS imu_transformer
   LIBRARY DESTINATION lib

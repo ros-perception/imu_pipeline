@@ -1,8 +1,5 @@
 #include <imu_transformer/imu_transformer.hpp>
-
-//#include "tf2_sensor_msgs/tf2_sensor_msgs.h"
-//Remove this header when https://github.com/ros/geometry_experimental/pull/78 is released
-#include "imu_transformer/tf2_sensor_msgs.h"
+#include <tf2_sensor_msgs/tf2_sensor_msgs.hpp>
 
 namespace imu_transformer
 {
