@@ -31,8 +31,7 @@ target_link_libraries(imu_transformer PUBLIC
   message_filters::message_filters
   rclcpp::rclcpp
   rclcpp_components::component
-  rclcpp_components::component_manager
-  sensor_msgs::sensor_msgs_library
+  tf2::tf2
   tf2_ros::tf2_ros
   tf2_sensor_msgs::tf2_sensor_msgs
 )
@@ -47,11 +46,19 @@ if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
 
   ament_add_gtest(test_imu_transforms test/test_imu_transforms.cpp)
-  target_link_libraries(test_imu_transforms ${geometry_msgs_TARGETS} ${sensor_msgs_TARGETS} sensor_msgs::sensor_msgs_library tf2::tf2 tf2_geometry_msgs::tf2_geometry_msgs tf2_ros::tf2_ros tf2_sensor_msgs::tf2_sensor_msgs)
+  target_link_libraries(test_imu_transforms
+    ${geometry_msgs_TARGETS}
+    ${sensor_msgs_TARGETS}
+    tf2::tf2
+    tf2_ros::tf2_ros
+    tf2_geometry_msgs::tf2_geometry_msgs
+    tf2_sensor_msgs::tf2_sensor_msgs
+  )
 endif()
 
 install(
   TARGETS imu_transformer
+  EXPORT ${PROJECT_NAME}_export
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
@@ -64,6 +71,17 @@ install(
 install(
   DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
+)
+
+ament_export_targets(${PROJECT_NAME}_export HAS_LIBRARY_TARGET)
+ament_export_dependencies(
+  message_filters
+  rclcpp
+  rclcpp_components
+  sensor_msgs
+  tf2
+  tf2_ros
+  tf2_sensor_msgs
 )
 
 ament_package()
