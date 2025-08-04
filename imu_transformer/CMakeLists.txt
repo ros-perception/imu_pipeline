@@ -31,8 +31,7 @@ target_link_libraries(imu_transformer PUBLIC
   message_filters::message_filters
   rclcpp::rclcpp
   rclcpp_components::component
-  rclcpp_components::component_manager
-  sensor_msgs::sensor_msgs_library
+  tf2::tf2
   tf2_ros::tf2_ros
   tf2_sensor_msgs::tf2_sensor_msgs
 )
@@ -43,6 +42,7 @@ rclcpp_components_register_node(imu_transformer
 
 install(
   TARGETS imu_transformer
+  EXPORT ${PROJECT_NAME}_export
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
@@ -55,6 +55,17 @@ install(
 install(
   DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
+)
+
+ament_export_targets(${PROJECT_NAME}_export HAS_LIBRARY_TARGET)
+ament_export_dependencies(
+  message_filters
+  rclcpp
+  rclcpp_components
+  sensor_msgs
+  tf2
+  tf2_ros
+  tf2_sensor_msgs
 )
 
 ament_package()
