@@ -190,11 +190,15 @@ private:
 
   void check_legacy_subscribers()
   {
-    if (legacy_pub_->get_subscription_count() > 0)
+    // Sum up both types of connections
+    size_t total_subs = legacy_pub_->get_subscription_count() +
+                        legacy_pub_->get_intra_process_subscription_count();
+
+    if (total_subs > 0)
     {
       RCLCPP_ERROR(this->get_logger(),
         "LEGACY SUBSCRIBER DETECTED: One or more nodes are subscribed to 'imu_biased'. "
-        "This topic is DEPRECATED and receives no data. Please switch to 'imu_unbiased'.");
+        "This topic is DEPRECATED and publishes no data. Please switch to 'imu_unbiased'.");
     }
   }
 
