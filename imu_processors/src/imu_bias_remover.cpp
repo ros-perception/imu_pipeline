@@ -105,11 +105,12 @@ public:
       "imu", rclcpp::SystemDefaultsQoS(),
       std::bind(&ImuBiasRemover::imu_callback, this, std::placeholders::_1));
 
-    RCLCPP_WARN(this->get_logger(),
-    "\nThe following topic has been renamed:\n"
-    " - Output: '/imu_biased' -> '/imu_unbiased'\n"
-    "Please update your launch files or remapping rules."
-    );
+    // Legacy output (Ghost)
+    legacy_pub_ = this->create_publisher<sensor_msgs::msg::Imu>("imu_biased", 10);
+
+    // Create a timer that calls check_legacy_subscribers every 5 seconds
+    legacy_check_timer_ = this->create_wall_timer(
+    std::chrono::seconds(5), std::bind(&ImuBiasRemover::check_legacy_subscribers, this));
   }
 
 private:
@@ -187,6 +188,16 @@ private:
     bias_pub_->publish(bias);
   }
 
+  void check_legacy_subscribers()
+  {
+    if (legacy_pub_->get_subscription_count() > 0)
+    {
+      RCLCPP_ERROR(this->get_logger(),
+        "LEGACY SUBSCRIBER DETECTED: One or more nodes are subscribed to 'imu_biased'. "
+        "This topic is DEPRECATED and receives no data. Please switch to 'imu_unbiased'.");
+    }
+  }
+
 private:
   bool twist_is_zero_;
   bool odom_is_zero_;
@@ -202,12 +213,15 @@ private:
   geometry_msgs::msg::Vector3 accumulator_;
   double alpha_;
 
-  rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr pub_;
+  rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr pub_, legacy_pub_;
   rclcpp::Publisher<geometry_msgs::msg::Vector3Stamped>::SharedPtr bias_pub_;
   rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_sub_;
   rclcpp::Subscription<geometry_msgs::msg::TwistStamped>::SharedPtr cmd_stamped_sub_;
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
   rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr imu_sub_;
+
+  // Timer for legacy checking
+  rclcpp::TimerBase::SharedPtr legacy_check_timer_;
 };
 
 }  // namespace imu_processors
