@@ -104,8 +104,8 @@ public:
     imu_sub_ = this->create_subscription<sensor_msgs::msg::Imu>(
       "imu", rclcpp::SystemDefaultsQoS(),
       std::bind(&ImuBiasRemover::imu_callback, this, std::placeholders::_1));
-    
-    RCLCPP_WARN(this->get_logger(), 
+
+    RCLCPP_WARN(this->get_logger(),
     "\nThe following topic has been renamed:\n"
     " - Output: '/imu_biased' -> '/imu_unbiased'\n"
     "Please update your launch files or remapping rules."
@@ -130,10 +130,12 @@ private:
 
   void cmd_vel_stamped_callback(const geometry_msgs::msg::TwistStamped::ConstSharedPtr & msg)
   {
-    if (
-      abslt(msg->twist.linear.x, cmd_vel_threshold_) && abslt(msg->twist.linear.y, cmd_vel_threshold_) &&
-      abslt(msg->twist.linear.z, cmd_vel_threshold_) && abslt(msg->twist.angular.x, cmd_vel_threshold_) &&
-      abslt(msg->twist.angular.y, cmd_vel_threshold_) && abslt(msg->twist.angular.z, cmd_vel_threshold_)) {
+    if (abslt(msg->twist.linear.x, cmd_vel_threshold_) &&
+      abslt(msg->twist.linear.y, cmd_vel_threshold_) &&
+      abslt(msg->twist.linear.z, cmd_vel_threshold_) &&
+      abslt(msg->twist.angular.x, cmd_vel_threshold_) &&
+      abslt(msg->twist.angular.y, cmd_vel_threshold_) &&
+      abslt(msg->twist.angular.z, cmd_vel_threshold_)) {
       twist_is_zero_ = true;
       return;
     }
