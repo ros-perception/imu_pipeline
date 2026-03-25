@@ -97,13 +97,19 @@ public:
     odom_threshold_ = this->declare_parameter<double>("odom_threshold", 0.001);
 
     // Create publisher
-    pub_ = this->create_publisher<sensor_msgs::msg::Imu>("imu_biased", 10);
+    pub_ = this->create_publisher<sensor_msgs::msg::Imu>("imu_unbiased", 10);
     bias_pub_ = this->create_publisher<geometry_msgs::msg::Vector3Stamped>("bias", 10);
 
     // Imu Subscriber
     imu_sub_ = this->create_subscription<sensor_msgs::msg::Imu>(
       "imu", rclcpp::SystemDefaultsQoS(),
       std::bind(&ImuBiasRemover::imu_callback, this, std::placeholders::_1));
+    
+    RCLCPP_WARN(this->get_logger(), 
+    "\nThe following topic has been renamed:\n"
+    " - Output: '/imu_biased' -> '/imu_unbiased'\n"
+    "Please update your launch files or remapping rules."
+    );
   }
 
 private:
