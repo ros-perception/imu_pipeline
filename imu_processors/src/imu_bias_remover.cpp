@@ -110,7 +110,9 @@ public:
       rclcpp::PublisherOptions options;
       options.event_callbacks.matched_callback = [this](rclcpp::MatchedInfo & info) {
         if (info.current_count > 0 || info.intra_process_current_count > 0) {
-          RCLCPP_ERROR(this->get_logger(), "Legacy sub detected on 'imu_biased'!");
+          RCLCPP_ERROR(this->get_logger(),
+            "LEGACY SUBSCRIBER DETECTED: One or more nodes are subscribed to 'imu_biased'. "
+            "This topic is DEPRECATED and publishes no data. Please switch to 'imu_unbiased'.");
         }
       };
       legacy_pub_ = this->create_publisher<sensor_msgs::msg::Imu>("imu_biased", 10, options);
@@ -121,10 +123,12 @@ public:
       legacy_timer_ = this->create_wall_timer(
         std::chrono::seconds(5),
         [this]() {
-          auto total = legacy_pub_->get_subscription_count() + 
+          auto total = legacy_pub_->get_subscription_count() +
                       legacy_pub_->get_intra_process_subscription_count();
           if (total > 0) {
-            RCLCPP_ERROR(this->get_logger(), "Legacy sub detected on 'imu_biased'!");
+            RCLCPP_ERROR(this->get_logger(),
+            "LEGACY SUBSCRIBER DETECTED: One or more nodes are subscribed to 'imu_biased'. "
+            "This topic is DEPRECATED and publishes no data. Please switch to 'imu_unbiased'.");
           }
         });
     #endif
