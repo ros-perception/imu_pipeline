@@ -105,12 +105,29 @@ public:
       "imu", rclcpp::SystemDefaultsQoS(),
       std::bind(&ImuBiasRemover::imu_callback, this, std::placeholders::_1));
 
-    // Legacy output (Ghost)
-    legacy_pub_ = this->create_publisher<sensor_msgs::msg::Imu>("imu_biased", 10);
+    #ifdef IS_ROS2_JAZZY
+      // JAZZY+ VERSION: Use the Matched Callback
+      rclcpp::PublisherOptions options;
+      options.event_callbacks.matched_callback = [this](rclcpp::MatchedInfo & info) {
+        if (info.current_count > 0 || info.intra_process_current_count > 0) {
+          RCLCPP_ERROR(this->get_logger(), "Legacy sub detected on 'imu_biased'!");
+        }
+      };
+      legacy_pub_ = this->create_publisher<sensor_msgs::msg::Imu>("imu_biased", 10, options);
 
-    // Create a timer that calls check_legacy_subscribers every 5 seconds
-    legacy_check_timer_ = this->create_wall_timer(
-    std::chrono::seconds(5), std::bind(&ImuBiasRemover::check_legacy_subscribers, this));
+    #else
+      // HUMBLE VERSION: Use the Timer
+      legacy_pub_ = this->create_publisher<sensor_msgs::msg::Imu>("imu_biased", 10);
+      legacy_timer_ = this->create_wall_timer(
+        std::chrono::seconds(5),
+        [this]() {
+          auto total = legacy_pub_->get_subscription_count() + 
+                      legacy_pub_->get_intra_process_subscription_count();
+          if (total > 0) {
+            RCLCPP_ERROR(this->get_logger(), "Legacy sub detected on 'imu_biased'!");
+          }
+        });
+    #endif
   }
 
 private:
@@ -188,20 +205,6 @@ private:
     bias_pub_->publish(bias);
   }
 
-  void check_legacy_subscribers()
-  {
-    // Sum up both types of connections
-    size_t total_subs = legacy_pub_->get_subscription_count() +
-                        legacy_pub_->get_intra_process_subscription_count();
-
-    if (total_subs > 0)
-    {
-      RCLCPP_ERROR(this->get_logger(),
-        "LEGACY SUBSCRIBER DETECTED: One or more nodes are subscribed to 'imu_biased'. "
-        "This topic is DEPRECATED and publishes no data. Please switch to 'imu_unbiased'.");
-    }
-  }
-
 private:
   bool twist_is_zero_;
   bool odom_is_zero_;
@@ -225,7 +228,7 @@ private:
   rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr imu_sub_;
 
   // Timer for legacy checking
-  rclcpp::TimerBase::SharedPtr legacy_check_timer_;
+  rclcpp::TimerBase::SharedPtr legacy_timer_;
 };
 
 }  // namespace imu_processors

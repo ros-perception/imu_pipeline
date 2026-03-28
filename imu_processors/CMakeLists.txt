@@ -18,6 +18,12 @@ find_package(rclcpp_components REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 
+if("$ENV{ROS_DISTRO}" STREQUAL "humble")
+    add_compile_definitions(IS_ROS2_HUMBLE)
+elseif("$ENV{ROS_DISTRO}" STREQUAL "jazzy")
+    add_compile_definitions(IS_ROS2_JAZZY)
+endif()
+
 add_library(imu_integrator SHARED
   src/imu_integrator.cpp
 )
