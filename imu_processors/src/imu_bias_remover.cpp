@@ -97,13 +97,42 @@ public:
     odom_threshold_ = this->declare_parameter<double>("odom_threshold", 0.001);
 
     // Create publisher
-    pub_ = this->create_publisher<sensor_msgs::msg::Imu>("imu_biased", 10);
+    pub_ = this->create_publisher<sensor_msgs::msg::Imu>("imu_unbiased", 10);
     bias_pub_ = this->create_publisher<geometry_msgs::msg::Vector3Stamped>("bias", 10);
 
     // Imu Subscriber
     imu_sub_ = this->create_subscription<sensor_msgs::msg::Imu>(
       "imu", rclcpp::SystemDefaultsQoS(),
       std::bind(&ImuBiasRemover::imu_callback, this, std::placeholders::_1));
+
+    // Check for legacy topic subscribers
+    #ifdef RCLCPP_HAS_MATCHED_EVENT_CALLBACK
+      // JAZZY+ VERSION: Use the Matched Callback
+      rclcpp::PublisherOptions pub_options;
+      pub_options.event_callbacks.matched_callback = [this](rclcpp::MatchedInfo & info) {
+        if (info.current_count > 0) {
+          RCLCPP_ERROR(this->get_logger(),
+            "LEGACY SUBSCRIBER DETECTED: One or more nodes are subscribed to 'imu_biased'. "
+            "This topic is DEPRECATED and publishes no data. Please switch to 'imu_unbiased'.");
+        }
+      };
+      legacy_pub_ = this->create_publisher<sensor_msgs::msg::Imu>("imu_biased", 10, pub_options);
+
+    #else
+      // HUMBLE VERSION: Use the Timer
+      legacy_pub_ = this->create_publisher<sensor_msgs::msg::Imu>("imu_biased", 10);
+      legacy_timer_ = this->create_wall_timer(
+        std::chrono::seconds(5),
+        [this]() {
+          auto total = legacy_pub_->get_subscription_count() +
+                      legacy_pub_->get_intra_process_subscription_count();
+          if (total > 0) {
+            RCLCPP_ERROR(this->get_logger(),
+            "LEGACY SUBSCRIBER DETECTED: One or more nodes are subscribed to 'imu_biased'. "
+            "This topic is DEPRECATED and publishes no data. Please switch to 'imu_unbiased'.");
+          }
+        });
+    #endif
   }
 
 private:
@@ -124,10 +153,12 @@ private:
 
   void cmd_vel_stamped_callback(const geometry_msgs::msg::TwistStamped::ConstSharedPtr & msg)
   {
-    if (
-      abslt(msg->twist.linear.x, cmd_vel_threshold_) && abslt(msg->twist.linear.y, cmd_vel_threshold_) &&
-      abslt(msg->twist.linear.z, cmd_vel_threshold_) && abslt(msg->twist.angular.x, cmd_vel_threshold_) &&
-      abslt(msg->twist.angular.y, cmd_vel_threshold_) && abslt(msg->twist.angular.z, cmd_vel_threshold_)) {
+    if (abslt(msg->twist.linear.x, cmd_vel_threshold_) &&
+      abslt(msg->twist.linear.y, cmd_vel_threshold_) &&
+      abslt(msg->twist.linear.z, cmd_vel_threshold_) &&
+      abslt(msg->twist.angular.x, cmd_vel_threshold_) &&
+      abslt(msg->twist.angular.y, cmd_vel_threshold_) &&
+      abslt(msg->twist.angular.z, cmd_vel_threshold_)) {
       twist_is_zero_ = true;
       return;
     }
@@ -194,12 +225,15 @@ private:
   geometry_msgs::msg::Vector3 accumulator_;
   double alpha_;
 
-  rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr pub_;
+  rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr pub_, legacy_pub_;
   rclcpp::Publisher<geometry_msgs::msg::Vector3Stamped>::SharedPtr bias_pub_;
   rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_sub_;
   rclcpp::Subscription<geometry_msgs::msg::TwistStamped>::SharedPtr cmd_stamped_sub_;
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
   rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr imu_sub_;
+
+  // Timer for legacy checking
+  rclcpp::TimerBase::SharedPtr legacy_timer_;
 };
 
 }  // namespace imu_processors

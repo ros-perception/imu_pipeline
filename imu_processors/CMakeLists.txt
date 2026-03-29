@@ -18,6 +18,12 @@ find_package(rclcpp_components REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 
+# Check for Matched Event Callback support (added in rclcpp 20.0.0)
+# Humble is ~16.x, Jazzy is ~28.x
+if(rclcpp_VERSION VERSION_GREATER_EQUAL 20.0.0)
+    add_compile_definitions(RCLCPP_HAS_MATCHED_EVENT_CALLBACK)
+endif()
+
 add_library(imu_integrator SHARED
   src/imu_integrator.cpp
 )
