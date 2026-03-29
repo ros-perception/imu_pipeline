@@ -105,6 +105,7 @@ public:
       "imu", rclcpp::SystemDefaultsQoS(),
       std::bind(&ImuBiasRemover::imu_callback, this, std::placeholders::_1));
 
+    // Check for legacy topic subscribers
     #ifdef RCLCPP_HAS_MATCHED_EVENT_CALLBACK
       // JAZZY+ VERSION: Use the Matched Callback
       rclcpp::PublisherOptions pub_options;
