@@ -105,17 +105,17 @@ public:
       "imu", rclcpp::SystemDefaultsQoS(),
       std::bind(&ImuBiasRemover::imu_callback, this, std::placeholders::_1));
 
-    #ifdef IS_ROS2_JAZZY
+    #ifdef RCLCPP_HAS_MATCHED_EVENT_CALLBACK
       // JAZZY+ VERSION: Use the Matched Callback
-      rclcpp::PublisherOptions options;
-      options.event_callbacks.matched_callback = [this](rclcpp::MatchedInfo & info) {
-        if (info.current_count > 0 || info.intra_process_current_count > 0) {
+      rclcpp::PublisherOptions pub_options;
+      pub_options.event_callbacks.matched_callback = [this](rclcpp::MatchedInfo & info) {
+        if (info.current_count > 0) {
           RCLCPP_ERROR(this->get_logger(),
             "LEGACY SUBSCRIBER DETECTED: One or more nodes are subscribed to 'imu_biased'. "
             "This topic is DEPRECATED and publishes no data. Please switch to 'imu_unbiased'.");
         }
       };
-      legacy_pub_ = this->create_publisher<sensor_msgs::msg::Imu>("imu_biased", 10, options);
+      legacy_pub_ = this->create_publisher<sensor_msgs::msg::Imu>("imu_biased", 10, pub_options);
 
     #else
       // HUMBLE VERSION: Use the Timer
