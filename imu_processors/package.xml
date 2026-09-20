@@ -4,7 +4,7 @@
   <version>0.6.1</version>
   <description>Processors for sensor_msgs::Imu data</description>
 
-  <license>BSD</license>
+  <license>BSD-3-Clause</license>
 
   <url type="website">http://ros.org/wiki/imu_processors</url>
   <url type="bugtracker">https://github.com/ros-perception/imu_processors/issues</url>
