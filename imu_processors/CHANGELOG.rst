@@ -1,6 +1,11 @@
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package imu_processors
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Forthcoming
+-----------
+* fix linting regression (`#33 <https://github.com/ros-perception/imu_pipeline/issues/33>`_)
+* Contributors: Michael Ferguson
 
 0.6.1 (2025-06-02)
 ------------------
