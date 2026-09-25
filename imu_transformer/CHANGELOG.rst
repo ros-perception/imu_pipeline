@@ -2,8 +2,8 @@
 Changelog for package imu_transformer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.2 (2026-09-25)
+------------------
 * Use NodeInterfaces for tf2_ros constructors (`#40 <https://github.com/ros-perception/imu_pipeline/issues/40>`_)
 * CMake cleanup & target export (`#34 <https://github.com/ros-perception/imu_pipeline/issues/34>`_)
 * Contributors: Michael Carroll, Patrick Roncagliolo
