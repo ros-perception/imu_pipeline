@@ -5,8 +5,8 @@
   <version>0.6.2</version>
   <description>imu_pipeline</description>
 
-  <license>BSD</license>
-  <license>GPL</license>
+  <license>BSD-3-Clause</license>
+  <license>GPL-3.0-only</license>
 
   <url type="website">http://ros.org/wiki/imu_pipeline</url>
   <url type="bugtracker">https://github.com/ros-perception/imu_pipeline/issues</url>
